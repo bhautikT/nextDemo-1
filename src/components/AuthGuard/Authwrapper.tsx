@@ -5,10 +5,10 @@ import { ComponentType, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 //auth props
-type WithAuthProps = {
-  [key: string]: any;
-};
-const withAuth = <P extends WithAuthProps>(WrappedComponent: ComponentType<P>) => {
+// type WithAuthProps = {
+//   [key: string]: any;
+// };
+const withAuth = (WrappedComponent: any) => {
   // This function will be part of the component's return, ensuring it only runs client-side.
   const verifyToken = () => {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -16,7 +16,7 @@ const withAuth = <P extends WithAuthProps>(WrappedComponent: ComponentType<P>) =
     return !!token;
   };
 
-  return (props: P) => {
+  return (props: any) => {
     const router = useRouter();
     const isAuthenticated = verifyToken();
 

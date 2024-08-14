@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Providers } from "@/redux/provider";
 import { Persistor } from "@/redux/persistort";
 import "./globals.css";
+import SessionWrapper from "@/components/SessionWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,12 +19,14 @@ export default function RootLayout({
 }>) {
   return (
     //wrap provider components
-    <Providers>
-      <Persistor>
-        <html lang="en">
-          <body className={inter.className}>{children}</body>
-        </html>
-      </Persistor>
-    </Providers>
+    <SessionWrapper>
+      <Providers>
+        <Persistor>
+          <html lang="en">
+            <body className={inter.className}>{children}</body>
+          </html>
+        </Persistor>
+      </Providers>
+    </SessionWrapper>
   );
 }
