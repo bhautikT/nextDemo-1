@@ -23,11 +23,11 @@ interface SignupFormValues {
 }
 
 const skillOptions = [
-  { value: "JavaScript", label: "JavaScript" },
-  { value: "React", label: "React" },
-  { value: "Node.js", label: "Node.js" },
-  { value: "TypeScript", label: "TypeScript" },
-  { value: "CSS", label: "CSS" },
+  { value: 1, label: "JavaScript" },
+  { value: 2, label: "React" },
+  { value: 3, label: "Node.js" },
+  { value: 4, label: "TypeScript" },
+  { value: 5, label: "CSS" },
 ];
 
 const Signup = () => {
@@ -46,19 +46,44 @@ const Signup = () => {
     images: [],
   };
 
-  const onSubmit = (
+  const onSubmit = async (
     values: SignupFormValues,
     { resetForm }: { resetForm: () => void }
   ) => {
-    const { confirmPassword, ...formData } = values;
-    console.log(formData, "formData");
-    // Handle form submission with images here
-    dispatch(signInUser({ data: formData }));
+    // Create a FormData object
+    const formData = new FormData();
+    const skillValues = values?.skills?.map((skill) => skill.value);
 
+    // Append each field to FormData
+    formData.append("name", values.name);
+    formData.append("email", values.email);
+    formData.append("password", values.password);
+    // formData.append("confirmPassword", values.confirmPassword);
+    formData.append("phoneNumber", values.phoneNumber);
+    formData.append("gender", values.gender);
+    formData.append("terms", values.terms.toString()); // Convert boolean to string
+
+    // Append skills as a comma-separated string if needed
+    formData.append("skills", JSON.stringify(skillValues));
+
+    // Append images
+    values.images.forEach((image) => {
+      formData.append("profile_image", image);
+    });
+
+    try {
+      const response = await dispatch(signInUser(formData)).unwrap();
+      // Handle success
+      console.log("Success:", response);
+    } catch (error) {
+      // Handle error
+      console.error("Error:", error);
+    }
+
+    // Reset form and previews
     resetForm();
     setPreviews([]);
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-10">
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8 max-h-screen overflow-y-auto">

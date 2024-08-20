@@ -1,49 +1,47 @@
-import { signInUser } from "@/services/authService";
 import { createSlice } from "@reduxjs/toolkit";
+import { signInUser } from "@/services/authService";
 import toast from "react-hot-toast";
 
-//create new slice
+interface AuthState {
+  user: string;
+  loading: boolean;
+  error?: string;
+}
+
+const initialState: AuthState = {
+  user: "bhautik",
+  loading: false,
+};
+
 const authSlice = createSlice({
   name: "auth",
-  initialState: {
-    user: "bhautik",
-  },
+  initialState,
   reducers: {
     logout: (state) => {
       state.user = "";
     },
   },
-  //create reducer
   extraReducers: (builder) => {
-    //sign in
     builder
       .addCase(signInUser.pending, (state) => {
-        return {
-          ...state,
-          loading: true,
-        };
+        state.loading = true;
       })
       .addCase(signInUser.fulfilled, (state, action) => {
-        if (action?.payload?.status === false) {
-          toast.error(action?.payload);
+        state.loading = false;
+        if (action.payload?.status === false) {
+          toast.error(action.payload?.message || "Error occurred");
         } else {
-          toast.success(action?.payload?.message);
+          toast.success(action.payload?.message || "Registration successful");
         }
-        return {
-          ...state,
-          loading: false,
-        };
+        state.user = action.payload?.user || ""; // Update with the user data if available
       })
       .addCase(signInUser.rejected, (state, action) => {
-        return {
-          ...state,
-          loading: false,
-          error: action.payload,
-        };
+        state.loading = false;
+        state.error = action.payload as string;
+        toast.error(state.error || "An error occurred");
       });
   },
 });
 
 export const { logout } = authSlice.actions;
-
 export default authSlice.reducer;

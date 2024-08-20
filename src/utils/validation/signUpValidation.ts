@@ -41,7 +41,9 @@ export const signupValidationSchema = Yup.object({
       (value) => !/^\s/.test(value || "")
     )
     .required("Phone number is required"),
-  gender: Yup.string().required("Gender is required"),
+  gender: Yup.string()
+    .oneOf(["male", "female"], "Please select a gender")
+    .required("Gender is required"),
   skills: Yup.array()
     .of(
       Yup.object().shape({

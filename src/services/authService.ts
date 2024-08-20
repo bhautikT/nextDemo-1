@@ -1,19 +1,19 @@
+import AxiosDefaultSetting from "@/AxiosSetting";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import AxiosDefaultSetting from "../AxiosSetting";
 
-//signin user
-export const signInUser: any = createAsyncThunk(
-  "auth/signin",
-  async (data, { rejectWithValue }) => {
+export const signInUser = createAsyncThunk(
+  "auth/signInUser",
+  async (formData: FormData, { rejectWithValue }) => {
     try {
       const response = await AxiosDefaultSetting({
         method: "POST",
-        url: "/auth/login", //endpoint
-        data: data,
+        data: formData,
+        url: "/register",
+        contentType: "multipart/form-data", // Ensure content type is set for FormData
       });
       return response.data;
-    } catch (error) {
-      return rejectWithValue(error);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );

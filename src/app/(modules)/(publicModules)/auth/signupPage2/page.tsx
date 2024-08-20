@@ -224,12 +224,8 @@ const Signup2 = () => {
                         type="radio"
                         id="male"
                         value="male"
-                        {...field}
-                        onChange={(e) => {
-                          clearErrors(`gender`);
-                          setValue(`gender`, e.target.value);
-                        }}
-                        // checked={field.value === "male"}
+                        checked={field.value === "male"}
+                        onChange={() => field.onChange("male")}
                         className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
                       />
                       <label
@@ -244,13 +240,8 @@ const Signup2 = () => {
                         type="radio"
                         id="female"
                         value="female"
-                        {...field}
-                        // checked={field.value === "female"}
-                        onChange={(e) => {
-                          clearErrors(`gender`);
-                          setValue(`gender`, e.target.value);
-                          // Trigger validation
-                        }}
+                        checked={field.value === "female"}
+                        onChange={() => field.onChange("female")}
                         className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
                       />
                       <label
