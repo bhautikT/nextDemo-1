@@ -59,6 +59,18 @@ export default function Login() {
       >
         Sign in with Twitter
       </button>
+      <button
+        className="bg-none border-gray-300 border py-2 px-6 rounded-md mb-2"
+        onClick={() => signIn("facebook")}
+      >
+        Sign in with Facebook
+      </button>
+      <button
+        className="bg-none border-gray-300 border py-2 px-6 rounded-md mb-2"
+        onClick={() => signIn("linkedin")}
+      >
+        Sign in with LinkedIn
+      </button>
     </div>
   );
 }

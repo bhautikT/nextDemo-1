@@ -9,6 +9,7 @@ import { signInUser } from "@/services/authService";
 import withAuthPublic from "@/components/AuthGuard/Auth-wrapper-public";
 import { AiOutlineClose, AiOutlineCloudUpload } from "react-icons/ai";
 import { signupValidationSchema } from "../../../../../utils/validation/signUpValidation";
+import { AppDispatch } from "@/redux/store";
 
 interface SignupFormValues {
   name: string;
@@ -32,7 +33,7 @@ const skillOptions = [
 
 const Signup = () => {
   const [previews, setPreviews] = useState<string[]>([]);
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const initialValues: SignupFormValues = {
     name: "",

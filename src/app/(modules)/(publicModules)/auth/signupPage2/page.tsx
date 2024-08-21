@@ -11,13 +11,14 @@ import { AiOutlineClose, AiOutlineCloudUpload } from "react-icons/ai";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signupValidationSchema } from "../../../../../utils/validation/signUpValidation";
+import { AppDispatch } from "@/redux/store";
 
 const skillOptions = [
-  { value: "JavaScript", label: "JavaScript" },
-  { value: "React", label: "React" },
-  { value: "Node.js", label: "Node.js" },
-  { value: "TypeScript", label: "TypeScript" },
-  { value: "CSS", label: "CSS" },
+  { value: 1, label: "JavaScript" },
+  { value: 2, label: "React" },
+  { value: 3, label: "Node.js" },
+  { value: 4, label: "TypeScript" },
+  { value: 5, label: "CSS" },
 ];
 
 interface SignupFormValues {
@@ -34,7 +35,7 @@ interface SignupFormValues {
 
 const Signup2 = () => {
   const [previews, setPreviews] = useState<string[]>([]);
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const {
     control,
@@ -42,6 +43,7 @@ const Signup2 = () => {
     setValue,
     clearErrors,
     setError,
+    reset,
     watch,
     formState: { errors },
   } = useForm<SignupFormValues>({
@@ -59,10 +61,39 @@ const Signup2 = () => {
     },
   });
 
-  const onSubmit = (data: SignupFormValues) => {
-    const { confirmPassword, ...formData } = data;
-    console.log(formData, "formData");
-    dispatch(signInUser({ data: formData }));
+  const onSubmit = async (data: SignupFormValues) => {
+    // Create a FormData object
+    const formData = new FormData();
+    const skillValues = data?.skills?.map((skill) => skill.value);
+
+    // Append each field to FormData
+    formData.append("name", data.name);
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+    // formData.append("confirmPassword", values.confirmPassword);
+    formData.append("phoneNumber", data.phoneNumber);
+    formData.append("gender", data.gender);
+    formData.append("terms", data.terms.toString()); // Convert boolean to string
+
+    // Append skills as a comma-separated string if needed
+    formData.append("skills", JSON.stringify(skillValues));
+
+    // Append images
+    data.images.forEach((image) => {
+      formData.append("profile_image", image);
+    });
+
+    try {
+      const response = await dispatch(signInUser(formData)).unwrap();
+      // Handle success
+      console.log("Success:", response);
+    } catch (error) {
+      // Handle error
+      console.error("Error:", error);
+    }
+
+    // Reset form and previews
+    reset();
     setPreviews([]);
   };
 
@@ -283,7 +314,7 @@ const Signup2 = () => {
                     setValue("skills", selectedOptions, {
                       shouldValidate: true,
                     });
-                    clearErrors("skills", []);
+                    clearErrors("skills");
                   }}
                   className="basic-multi-select"
                   classNamePrefix="select"
@@ -316,7 +347,7 @@ const Signup2 = () => {
                     const files = Array.from(event.target.files);
                     setValue("images", files);
                     setPreviews(files.map((file) => URL.createObjectURL(file)));
-                    clearErrors("images", []);
+                    clearErrors("images");
                   }
                 }}
                 className="sr-only" // Hide the actual input element
@@ -376,7 +407,10 @@ const Signup2 = () => {
                   <input
                     type="checkbox"
                     id="terms"
-                    {...field}
+                    // Remove value attribute
+                    checked={field.value} // Use checked to reflect current value
+                    onChange={(e) => field.onChange(e.target.checked)} // Handle change correctly
+                    onBlur={field.onBlur} // Handle blur event
                     className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
                   />
                   <label htmlFor="terms" className="ml-2 text-sm text-gray-700">
