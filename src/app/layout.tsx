@@ -4,6 +4,7 @@ import { Providers } from "@/redux/provider";
 import { Persistor } from "@/redux/persistort";
 import "./globals.css";
 import SessionWrapper from "@/components/SessionWrapper";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
       <Providers>
         <Persistor>
           <html lang="en">
+            <Toaster />
             <body className={inter.className}>{children}</body>
           </html>
         </Persistor>

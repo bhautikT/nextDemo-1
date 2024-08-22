@@ -27,8 +27,8 @@ const handler = NextAuth({
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
     }),
     LinkedInProvider({
-      clientId: process.env.linkdien_clientId as string,
-      clientSecret: process.env.linkdien_secreat as string,
+      clientId: process.env.LINKEDIN_CLIENT_ID as string,
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET as string,
     }),
   ],
   callbacks: {
@@ -50,16 +50,23 @@ const handler = NextAuth({
 
         try {
           const response = await axios.post(
-            `${process.env.NEXT_PUBLIC_API}/register`,
+            `${process.env.NEXT_PUBLIC_API}/users/social-login`,
             data
           );
           console.log("API response:", response.data);
+
+          if (response.data.error === "Email already exists") {
+            console.error("Email already exists with a different provider.");
+            return false; // Deny sign-in
+          }
+
+          return true;
         } catch (error) {
           console.error("API call error:", error);
         }
       }
 
-      return true; // Return true to proceed with the sign-in
+      return false; // Return true to proceed with the sign-in
     },
     async jwt({ token, user, account }) {
       // Only set these properties when user and account are defined (on initial sign-in)
