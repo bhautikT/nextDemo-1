@@ -1,5 +1,6 @@
 import AxiosDefaultSetting from "@/AxiosSetting";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import toast from "react-hot-toast";
 
 export const signInUser = createAsyncThunk(
   "auth/signInUser",
@@ -30,7 +31,46 @@ export const LoginUser = createAsyncThunk(
       });
       return response.data.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || error.message);
+      console.log(error, "error");
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const forgotPasswordHandler = createAsyncThunk(
+  "auth/forgotPassword",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await AxiosDefaultSetting({
+        method: "POST",
+        data: data,
+        url: "/auth/forgotPassword",
+        contentType: "application/json", // Ensure content type is set for FormData
+      });
+      console.log(response, "response123");
+      return toast.success(response?.data?.message);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
+      // return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const ResetPasswordHandler = createAsyncThunk(
+  "auth/resetPassword",
+  async ({ slug, data }: { slug: string; data: any }, { rejectWithValue }) => {
+    try {
+      const response = await AxiosDefaultSetting({
+        method: "PATCH",
+        data: data,
+        url: `/auth/resetPassword/${slug}`,
+        contentType: "application/json",
+      });
+      return toast.success(response?.data?.message);
+    } catch (error: any) {
+      console.log(error?.response?.data?.message, "error");
+      toast.error(error?.response?.data?.message);
+      // return rejectWithValue(error?.response?.data?.message || error.message);
     }
   }
 );

@@ -10,6 +10,14 @@ import { AppDispatch } from "@/redux/store";
 import { logout } from "@/redux/slice/authSlice";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import {
+  FaFacebook,
+  FaGithub,
+  FaGoogle,
+  FaLinkedin,
+  FaTwitter,
+} from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 const schema = yup.object().shape({
   email: yup
@@ -27,11 +35,8 @@ const schema = yup.object().shape({
 });
 
 export default function Login() {
-  const { data: session } = useSession();
   const dispatch: AppDispatch = useDispatch();
-  const UserData = useSelector((state: any) => state.root.signIn.loginData);
-
-  console.log(UserData, "useData");
+  const router = useRouter();
 
   // Form setup with react-hook-form and Yup validation
   const {
@@ -48,131 +53,109 @@ export default function Login() {
       const response = await dispatch(LoginUser(data));
       // Handle success
       console.log("Success:", response);
-      toast.success("login successfully");
+      if (response.error) {
+        router.push("/auth/loginPage");
+      } else {
+        router.push("/users");
+      }
+      // toast.success("login successfully");
     } catch (error) {
       // Handle error
-      console.error("Error:", error);
+      toast.error("something went wrong");
     }
   };
 
-  if (session) {
-    return (
-      <div className="w-full h-screen flex flex-col justify-center items-center">
-        <div className="w-44 h-44 relative mb-4">
-          <img
-            src={session.user?.image as string}
-            alt=""
-            className="object-cover rounded-full"
-          />
-        </div>
-        <p className="text-2xl mb-2">
-          Welcome <span className="font-bold">{session.user?.name}</span>.
-          Signed In As
-        </p>
-        <p className="font-bold mb-4">{session.user?.email}</p>
-        <button
-          className="bg-red-600 py-2 px-6 rounded-md"
-          onClick={() => signOut()}
-        >
-          Sign out
-        </button>
-      </div>
-    );
-  } else if (UserData?.token) {
-    return (
-      <div className="w-full h-screen flex flex-col justify-center items-center">
-        <div className="w-44 h-44 relative mb-4">
-          <img
-            src={UserData?.user?.profile_image[0]}
-            alt=""
-            className="object-cover rounded-full"
-          />
-        </div>
-        <p className="text-2xl mb-2">
-          Welcome <span className="font-bold">{UserData?.user?.name}</span>.
-          Signed In As
-        </p>
-        <p className="font-bold mb-4">{UserData?.user?.email}</p>
-        <button
-          className="bg-red-600 py-2 px-6 rounded-md"
-          onClick={() => dispatch(logout())}
-        >
-          Sign out
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full h-screen flex flex-col justify-center items-center">
-      <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-sm mb-4">
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Email
-          </label>
-          <input
-            type="email"
-            {...register("email")}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
-          <p className="text-red-500 text-xs mt-1">{errors.email?.message}</p>
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Password
-          </label>
-          <input
-            type="password"
-            {...register("password")}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
-          <p className="text-red-500 text-xs mt-1">
-            {errors.password?.message}
-          </p>
-        </div>
-        <div className="flex justify-between items-center">
-          <button
-            type="submit"
-            className="bg-blue-500 text-white py-2 px-4 rounded-md"
-          >
-            Sign in
-          </button>
-          <Link href="/auth/signupPage" className="text-black ">
-            Sign Up
+    <>
+      <div className="w-full h-screen flex flex-col justify-center items-center bg-gray-100">
+        <h1 className="text-4xl font-bold text-indigo-600 mb-6 animate-fade-in">
+          Welcome to my Next Website
+        </h1>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="w-full max-w-sm mb-8 bg-white p-6 rounded-lg shadow-md"
+        >
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              type="email"
+              {...register("email")}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+            <p className="text-red-500 text-xs mt-1">{errors.email?.message}</p>
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              type="password"
+              {...register("password")}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+            <p className="text-red-500 text-xs mt-1">
+              {errors.password?.message}
+            </p>
+          </div>
+          <div className="flex justify-between items-center mb-4">
+            <button
+              type="submit"
+              className="bg-blue-500 text-white py-2 px-4 rounded-md w-full"
+            >
+              Sign in
+            </button>
+          </div>
+          <Link href="/auth/forgotPassword" className="text-sm text-right">
+            <p className="text-blue-600 font-semibold hover:underline">
+              Forgot Password?
+            </p>
           </Link>
+          <br />
+          <Link href="/auth/signupPage">
+            <p className="text-sm mt-1 text-center text-gray-700">
+              Don't Have an Account?{" "}
+              <span className="text-blue-600 font-semibold hover:underline">
+                Sign Up
+              </span>
+            </p>
+          </Link>
+        </form>
+        <p className="text-2xl mb-2">Or sign in with</p>
+        <div className="flex space-x-4">
+          <button
+            className="p-2 rounded-full border border-gray-300 hover:bg-gray-100 transition duration-200"
+            onClick={() => signIn("github", { callbackUrl: "/users" })}
+          >
+            <FaGithub size={24} />
+          </button>
+          <button
+            className="p-2 rounded-full border border-gray-300"
+            onClick={() => signIn("google", { callbackUrl: "/users" })}
+          >
+            <FaGoogle size={24} />
+          </button>
+          <button
+            className="p-2 rounded-full border border-gray-300"
+            onClick={() => signIn("twitter", { callbackUrl: "/users" })}
+          >
+            <FaTwitter size={24} />
+          </button>
+          <button
+            className="p-2 rounded-full border border-gray-300"
+            onClick={() => signIn("facebook", { callbackUrl: "/users" })}
+          >
+            <FaFacebook size={24} />
+          </button>
+          <button
+            className="p-2 rounded-full border border-gray-300"
+            onClick={() => signIn("linkedin", { callbackUrl: "/users" })}
+          >
+            <FaLinkedin size={24} />
+          </button>
         </div>
-      </form>
-      <p className="text-2xl mb-2">Or sign in with</p>
-      <button
-        className="bg-none border-gray-300 border py-2 px-6 rounded-md mb-2"
-        onClick={() => signIn("github")}
-      >
-        Sign in with GitHub
-      </button>
-      <button
-        className="bg-none border-gray-300 border py-2 px-6 rounded-md mb-2"
-        onClick={() => signIn("google")}
-      >
-        Sign in with Google
-      </button>
-      <button
-        className="bg-none border-gray-300 border py-2 px-6 rounded-md mb-2"
-        onClick={() => signIn("twitter")}
-      >
-        Sign in with Twitter
-      </button>
-      <button
-        className="bg-none border-gray-300 border py-2 px-6 rounded-md mb-2"
-        onClick={() => signIn("facebook")}
-      >
-        Sign in with Facebook
-      </button>
-      <button
-        className="bg-none border-gray-300 border py-2 px-6 rounded-md mb-2"
-        onClick={() => signIn("linkedin")}
-      >
-        Sign in with LinkedIn
-      </button>
-    </div>
+      </div>
+    </>
   );
 }
