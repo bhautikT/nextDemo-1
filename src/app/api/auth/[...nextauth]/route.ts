@@ -7,6 +7,7 @@ import GoogleProvider from "next-auth/providers/google";
 import TwitterProvider from "next-auth/providers/twitter";
 import LinkedInProvider from "next-auth/providers/linkedin";
 import FacebookProvider from "next-auth/providers/facebook";
+import AppleProvider from "next-auth/providers/apple";
 
 const handler = NextAuth({
   providers: [
@@ -29,6 +30,10 @@ const handler = NextAuth({
     LinkedInProvider({
       clientId: process.env.LINKEDIN_CLIENT_ID as string,
       clientSecret: process.env.LINKEDIN_CLIENT_SECRET as string,
+    }),
+    AppleProvider({
+      clientId: process.env.APPLE_ID as string,
+      clientSecret: process.env.APPLE_SECRET as string,
     }),
   ],
   callbacks: {

@@ -11,6 +11,7 @@ import { logout } from "@/redux/slice/authSlice";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import {
+  FaApple,
   FaFacebook,
   FaGithub,
   FaGoogle,
@@ -53,7 +54,7 @@ function Login() {
   useEffect(() => {
     if (session) {
       localStorage.setItem("userSession", JSON.stringify(session));
-      router.push("/users");
+      router.push("/profile");
     }
   }, [session]);
 
@@ -68,7 +69,7 @@ function Login() {
         router.push("/auth/loginPage");
       } else if (LoginUser.fulfilled.match(response)) {
         // Handle the fulfilled case
-        router.push("/users");
+        router.push("/profile");
       }
       // toast.success("login successfully");
     } catch (error) {
@@ -165,6 +166,12 @@ function Login() {
             onClick={() => signIn("linkedin")}
           >
             <FaLinkedin size={24} />
+          </button>
+          <button
+            className="p-2 rounded-full border border-gray-300"
+            onClick={() => signIn("apple")}
+          >
+            <FaApple size={24} />
           </button>
         </div>
       </div>
