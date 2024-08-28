@@ -382,4 +382,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default withAuthPublic(Signup);

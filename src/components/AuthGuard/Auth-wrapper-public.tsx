@@ -3,6 +3,7 @@ import { useEffect, ComponentType } from "react";
 //import { routes } from "@/routes";
 //import Loadercomponent from "@/components/common/Loadercomponent";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 
 // // Define a type for the props of the WrappedComponent
 // type WithAuthProps = {
@@ -12,9 +13,12 @@ import { useRouter } from "next/navigation";
 const withAuthPublic = (WrappedComponent: any) => {
   // This function will be part of the component's return, ensuring it only runs client-side.
   const verifyToken = (): boolean => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const UserData = useSelector((state: any) => state.root.signIn.loginData);
+    const userSession: any = localStorage.getItem("userSession");
+    const sessionData = JSON.parse(userSession);
+    const token = typeof window !== "undefined" ? UserData?.token : null;
     // Implement your token verification logic here
-    return !!token;
+    return !!token || !!sessionData;
   };
 
   return (props: any) => {
@@ -24,11 +28,11 @@ const withAuthPublic = (WrappedComponent: any) => {
     useEffect(() => {
       // Since verifyToken checks the window object, it's safe to call here; it won't run server-side.
       if (isAuthenticated) {
-        router.replace("/dashboard");
+        router.replace("/users");
       }
     }, [isAuthenticated, router]);
 
-    if (!isAuthenticated) {
+    if (isAuthenticated) {
       // Display a loader or any placeholder while the redirection is in progress
       return <p>loading</p>;
     }

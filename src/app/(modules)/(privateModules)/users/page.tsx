@@ -32,6 +32,8 @@ function User() {
         <button
           className="bg-red-600 py-2 px-6 rounded-md"
           onClick={() => {
+            localStorage.removeItem("userSession");
+
             signOut({ callbackUrl: "/auth/loginPage" });
           }}
         >

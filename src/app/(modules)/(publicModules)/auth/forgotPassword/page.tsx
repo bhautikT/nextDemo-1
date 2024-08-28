@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { forgotPasswordHandler } from "@/services/authService";
+import withAuthPublic from "@/components/AuthGuard/Auth-wrapper-public";
 
 const schema = yup.object().shape({
   email: yup
@@ -18,7 +19,7 @@ const schema = yup.object().shape({
     .strict(true),
 });
 
-export default function ForgotPassword() {
+function ForgotPassword() {
   const dispatch: AppDispatch = useDispatch();
   const {
     register,
@@ -75,3 +76,5 @@ export default function ForgotPassword() {
     </div>
   );
 }
+
+export default withAuthPublic(ForgotPassword);

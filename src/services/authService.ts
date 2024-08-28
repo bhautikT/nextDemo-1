@@ -21,7 +21,7 @@ export const signInUser = createAsyncThunk(
 
 export const LoginUser = createAsyncThunk(
   "auth/LoginUser",
-  async (data, { rejectWithValue }) => {
+  async (data: { email: string; password: string }, { rejectWithValue }) => {
     try {
       const response = await AxiosDefaultSetting({
         method: "POST",
@@ -39,7 +39,7 @@ export const LoginUser = createAsyncThunk(
 
 export const forgotPasswordHandler = createAsyncThunk(
   "auth/forgotPassword",
-  async (data, { rejectWithValue }) => {
+  async (data: { email: string }, { rejectWithValue }) => {
     try {
       const response = await AxiosDefaultSetting({
         method: "POST",

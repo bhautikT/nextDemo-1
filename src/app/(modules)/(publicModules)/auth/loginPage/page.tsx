@@ -18,6 +18,8 @@ import {
   FaTwitter,
 } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import withAuthPublic from "@/components/AuthGuard/Auth-wrapper-public";
 
 const schema = yup.object().shape({
   email: yup
@@ -34,9 +36,10 @@ const schema = yup.object().shape({
     .strict(true),
 });
 
-export default function Login() {
+function Login() {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
+  const { data: session } = useSession();
 
   // Form setup with react-hook-form and Yup validation
   const {
@@ -47,15 +50,24 @@ export default function Login() {
     resolver: yupResolver(schema),
   });
 
+  useEffect(() => {
+    if (session) {
+      localStorage.setItem("userSession", JSON.stringify(session));
+      router.push("/users");
+    }
+  }, [session]);
+
   const onSubmit = async (data: { email: string; password: string }) => {
     console.log(data, "datatatata");
     try {
       const response = await dispatch(LoginUser(data));
       // Handle success
       console.log("Success:", response);
-      if (response.error) {
+      if (LoginUser.rejected.match(response)) {
+        // Handle the rejected case
         router.push("/auth/loginPage");
-      } else {
+      } else if (LoginUser.fulfilled.match(response)) {
+        // Handle the fulfilled case
         router.push("/users");
       }
       // toast.success("login successfully");
@@ -126,31 +138,31 @@ export default function Login() {
         <div className="flex space-x-4">
           <button
             className="p-2 rounded-full border border-gray-300 hover:bg-gray-100 transition duration-200"
-            onClick={() => signIn("github", { callbackUrl: "/users" })}
+            onClick={() => signIn("github")}
           >
             <FaGithub size={24} />
           </button>
           <button
             className="p-2 rounded-full border border-gray-300"
-            onClick={() => signIn("google", { callbackUrl: "/users" })}
+            onClick={() => signIn("google")}
           >
             <FaGoogle size={24} />
           </button>
           <button
             className="p-2 rounded-full border border-gray-300"
-            onClick={() => signIn("twitter", { callbackUrl: "/users" })}
+            onClick={() => signIn("twitter")}
           >
             <FaTwitter size={24} />
           </button>
           <button
             className="p-2 rounded-full border border-gray-300"
-            onClick={() => signIn("facebook", { callbackUrl: "/users" })}
+            onClick={() => signIn("facebook")}
           >
             <FaFacebook size={24} />
           </button>
           <button
             className="p-2 rounded-full border border-gray-300"
-            onClick={() => signIn("linkedin", { callbackUrl: "/users" })}
+            onClick={() => signIn("linkedin")}
           >
             <FaLinkedin size={24} />
           </button>
@@ -159,3 +171,5 @@ export default function Login() {
     </>
   );
 }
+
+export default withAuthPublic(Login);

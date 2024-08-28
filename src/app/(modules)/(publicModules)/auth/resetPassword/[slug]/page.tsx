@@ -9,6 +9,8 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { ResetPasswordHandler } from "@/services/authService";
+import { AppDispatch } from "@/redux/store";
+import withAuthPublic from "@/components/AuthGuard/Auth-wrapper-public";
 
 const schema = yup.object().shape({
   password: yup
@@ -19,12 +21,8 @@ const schema = yup.object().shape({
     .strict(true),
 });
 
-export default function ResetPassword({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  const dispatch = useDispatch();
+function ResetPassword({ params }: { params: { slug: string } }) {
+  const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
   const { slug } = params; // Retrieve the dynamic token from the URL
 
@@ -86,3 +84,5 @@ export default function ResetPassword({
     </div>
   );
 }
+
+export default withAuthPublic(ResetPassword);
