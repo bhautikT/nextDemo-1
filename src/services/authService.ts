@@ -14,7 +14,7 @@ export const signInUser = createAsyncThunk(
       });
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || error.message);
+      toast.error(error?.response?.data?.message);
     }
   }
 );
@@ -51,7 +51,6 @@ export const forgotPasswordHandler = createAsyncThunk(
       return toast.success(response?.data?.message);
     } catch (error: any) {
       toast.error(error?.response?.data?.message);
-      // return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
@@ -70,7 +69,43 @@ export const ResetPasswordHandler = createAsyncThunk(
     } catch (error: any) {
       console.log(error?.response?.data?.message, "error");
       toast.error(error?.response?.data?.message);
-      // return rejectWithValue(error?.response?.data?.message || error.message);
+    }
+  }
+);
+
+// Thunk to fetch users with pagination and search query
+export const fetchUsers = createAsyncThunk(
+  "users/fetchUsers",
+  async (
+    { page, searchQuery }: { page: number; searchQuery: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await AxiosDefaultSetting({
+        method: "GET",
+        url: `/users/getall?page=${page}&search=${searchQuery}`, // Assuming you have an endpoint like /users
+      });
+      console.log(response, "response");
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const deleteUserHandler = createAsyncThunk(
+  "auth/resetPassword",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await AxiosDefaultSetting({
+        method: "DELETE",
+        url: `/users/deleteUser/${id}`,
+        contentType: "application/json",
+      });
+      return toast.success(response?.data?.message);
+    } catch (error: any) {
+      console.log(error?.response?.data?.message, "error");
+      toast.error(error?.response?.data?.message);
     }
   }
 );

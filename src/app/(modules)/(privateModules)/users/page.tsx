@@ -1,36 +1,59 @@
 "use client";
-import React, { useState } from "react";
-import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { FaTrash, FaEye } from "react-icons/fa";
 import defaultImage from "../../../../../public/assets/images.png";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "@/redux/store";
+import { deleteUserHandler, fetchUsers } from "@/services/authService";
+import { setCurrentPage } from "@/redux/slice/userSlice";
+import useDebounce from "@/hooks/useDebounce";
+import { useSession } from "next-auth/react";
+import Swal from "sweetalert2";
 
 const Users = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 5;
+  const debouncedSearchQuery = useDebounce(searchQuery, 500); // 500ms delay
+  const { data: session } = useSession();
+  const UserData = useSelector((state: any) => state.root.signIn.loginData);
 
-  // Sample data
-  const users = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "johndoe@example.com",
-      profile_image: "/profile1.jpg",
-      provider: "Google",
-    },
-    // Add more users here
-  ];
-
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const dispatch: AppDispatch = useDispatch();
+  const { users, totalPages, currentPage, loading, error } = useSelector(
+    (state: any) => state.root.users
   );
 
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
-  const displayedUsers = filteredUsers.slice(
-    (currentPage - 1) * usersPerPage,
-    currentPage * usersPerPage
-  );
+  useEffect(() => {
+    if (debouncedSearchQuery !== searchQuery) {
+      dispatch(setCurrentPage(1));
+    }
+  }, [debouncedSearchQuery, dispatch, searchQuery]);
 
-  console.log(defaultImage, "defaultImage");
+  useEffect(() => {
+    dispatch(
+      fetchUsers({ page: currentPage, searchQuery: debouncedSearchQuery })
+    );
+  }, [currentPage, debouncedSearchQuery, dispatch]);
+
+  const DeletePopUp = (id: string) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteUserHandler(id));
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your file has been deleted.",
+          icon: "success",
+        });
+      }
+    });
+    console.log(id, "idddd");
+  };
 
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow-lg mt-[14px]">
@@ -45,64 +68,78 @@ const Users = () => {
         />
       </div>
 
-      <table className="min-w-full bg-white rounded-lg overflow-hidden shadow">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="py-4 px-6 text-left font-semibold text-gray-600">
-              Name
-            </th>
-            <th className="py-4 px-6 text-left font-semibold text-gray-600">
-              Email
-            </th>
-            <th className="py-4 px-6 text-left font-semibold text-gray-600">
-              Profile Image
-            </th>
-            <th className="py-4 px-6 text-left font-semibold text-gray-600">
-              Provider
-            </th>
-            <th className="py-4 px-6 text-left font-semibold text-gray-600">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {displayedUsers.map((user) => (
-            <tr key={user.id} className="hover:bg-gray-50">
-              <td className="py-4 px-6 border-b border-gray-200 text-gray-800">
-                {user.name}
-              </td>
-              <td className="py-4 px-6 border-b border-gray-200 text-gray-800">
-                {user.email}
-              </td>
-              <td className="py-4 px-6 border-b border-gray-200">
-                <img
-                  src={defaultImage.src}
-                  alt={user.name}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-              </td>
-              <td className="py-4 px-6 border-b border-gray-200 text-gray-800">
-                {user.provider}
-              </td>
-              <td className="py-4 px-6  border-gray-200 flex space-x-4">
-                <button className="text-blue-500 hover:text-blue-700">
-                  <FaEye size={20} />
-                </button>
-                <button className="text-green-500 hover:text-green-700">
-                  <FaEdit size={20} />
-                </button>
-                <button className="text-red-500 hover:text-red-700">
-                  <FaTrash size={20} />
-                </button>
-              </td>
+      {loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>Error: {error}</p>
+      ) : (
+        <table className="min-w-full bg-white rounded-lg overflow-hidden shadow">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="py-4 px-6 text-left font-semibold text-gray-600">
+                Name
+              </th>
+              <th className="py-4 px-6 text-left font-semibold text-gray-600">
+                Email
+              </th>
+              <th className="py-4 px-6 text-left font-semibold text-gray-600">
+                Profile Image
+              </th>
+              <th className="py-4 px-6 text-left font-semibold text-gray-600">
+                Provider
+              </th>
+              <th className="py-4 px-6 text-left font-semibold text-gray-600">
+                Actions
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {users?.map((user: any) => (
+              <tr key={user?.id} className="hover:bg-gray-50">
+                <td className="py-4 px-6  border-gray-200 text-gray-800">
+                  {user?.name}
+                </td>
+                <td className="py-4 px-6  border-gray-200 text-gray-800">
+                  {user?.email}
+                </td>
+                <td className="py-4 px-6  border-gray-200">
+                  <img
+                    src={user?.provider ? user.profile_image : defaultImage.src}
+                    alt={user?.name}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                </td>
+                <td className="py-4 px-6  border-gray-200 text-gray-800">
+                  {user?.provider ? user?.provider : "-"}
+                </td>
+                <td className="py-4 px-6 border-gray-200 flex space-x-4">
+                  {/* <button className="text-blue-500 hover:text-blue-700">
+                    <FaEye size={20} />
+                  </button> */}
+                  {/* <button className="text-green-500 hover:text-green-700">
+                    <FaEdit size={20} />
+                  </button> */}
+                  {!(
+                    session?.user?.email === user?.email ||
+                    UserData?.user?.email === user?.email
+                  ) && (
+                    <button
+                      className="text-red-500 hover:text-red-700"
+                      onClick={() => DeletePopUp(user?._id)}
+                    >
+                      <FaTrash size={20} />
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       <div className="mt-6 flex justify-between items-center">
         <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          onClick={() => dispatch(setCurrentPage(Math.max(currentPage - 1, 1)))}
           className={`px-4 py-2 rounded ${
             currentPage === 1
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -117,7 +154,7 @@ const Users = () => {
         </span>
         <button
           onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            dispatch(setCurrentPage(Math.min(currentPage + 1, totalPages)))
           }
           className={`px-4 py-2 rounded ${
             currentPage === totalPages

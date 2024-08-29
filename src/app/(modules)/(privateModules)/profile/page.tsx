@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import userimage from "../../../../../public/assets/images.png";
+import { resetData } from "@/redux/slice/userSlice";
 
 function User() {
   const { data: session } = useSession();
@@ -20,6 +21,7 @@ function User() {
       signOut({ callbackUrl: "/auth/loginPage" });
     } else {
       dispatch(logout());
+      dispatch(resetData());
       router.push("/auth/loginPage");
     }
   };

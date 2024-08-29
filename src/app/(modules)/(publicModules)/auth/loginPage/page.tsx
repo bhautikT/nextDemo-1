@@ -79,7 +79,7 @@ function Login() {
   };
 
   return (
-    <>
+    <div>
       <div className="w-full h-screen flex flex-col justify-center items-center bg-gray-100">
         <h1 className="text-4xl font-bold text-indigo-600 mb-6 animate-fade-in">
           Welcome to my Next Website
@@ -175,7 +175,7 @@ function Login() {
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

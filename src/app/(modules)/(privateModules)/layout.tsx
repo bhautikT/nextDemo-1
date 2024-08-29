@@ -9,6 +9,8 @@ import { AppDispatch } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/redux/slice/authSlice";
 import defaultImage from "../../../../public/assets/images.png";
+import dashboardIcon from "../../../../public/assets/dashboardIcon.png";
+import { resetData } from "@/redux/slice/userSlice";
 
 function DefaultLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
@@ -26,6 +28,7 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
       signOut({ callbackUrl: "/auth/loginPage" });
     } else {
       dispatch(logout());
+      dispatch(resetData());
       router.push("/auth/loginPage");
     }
   };
@@ -52,18 +55,12 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
         } bg-gradient-to-r from-gray-800 to-gray-600 text-white h-full overflow-hidden`}
       >
         <div className="p-4">
-          <button
-            onClick={() => setSidebarOpen(!isSidebarOpen)}
-            className="absolute top-4 right-4 text-white"
-          >
-            {isSidebarOpen ? "Collapse" : "Expand"}
-          </button>
           <h1
-            className={`text-2xl font-bold transition-opacity duration-300 ${
+            className={`text-xl font-bold transition-opacity duration-300 ${
               isSidebarOpen ? "opacity-100" : "opacity-0"
             }`}
           >
-            NEXT JS
+            <img src={dashboardIcon.src} alt="" />
           </h1>
           <nav className="mt-6">
             <ul>
