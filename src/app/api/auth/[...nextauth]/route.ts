@@ -30,6 +30,22 @@ const handler = NextAuth({
     LinkedInProvider({
       clientId: process.env.LINKEDIN_CLIENT_ID as string,
       clientSecret: process.env.LINKEDIN_CLIENT_SECRET as string,
+      wellKnown:
+        "https://www.linkedin.com/oauth/.well-known/openid-configuration",
+
+      authorization: {
+        params: { scope: "openid profile email" },
+      },
+      issuer: "https://www.linkedin.com",
+      jwks_endpoint: "https://www.linkedin.com/oauth/openid/jwks",
+      profile(profile, tokens) {
+        console.log(profile, "profile");
+        return {
+          id: profile.sub,
+          ...profile,
+          ...tokens,
+        };
+      },
     }),
     AppleProvider({
       clientId: process.env.APPLE_ID as string,
@@ -37,7 +53,7 @@ const handler = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       console.log("SignIn callback triggered");
       console.log("User:", user);
       console.log("Account:", account);

@@ -1,11 +1,13 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import authSlice from "./slice/authSlice";
 import userSlice from "./slice/userSlice";
+import productSlice from "./slice/productSlice";
 
 const combinedReducer = combineReducers({
   //defind all slice here
   signIn: authSlice,
   users: userSlice,
+  products: productSlice,
 });
 
 const rootReducer = (state: any, action: any) => {

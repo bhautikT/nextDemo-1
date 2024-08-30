@@ -18,6 +18,7 @@ function User() {
   const handleSignOut = () => {
     if (session) {
       localStorage.removeItem("userSession");
+      dispatch(resetData());
       signOut({ callbackUrl: "/auth/loginPage" });
     } else {
       dispatch(logout());
@@ -30,7 +31,11 @@ function User() {
     <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-gray-100">
       <div className="w-32 h-32 mb-4 overflow-hidden rounded-full border-4 border-gray-200 bg-white shadow-md">
         <img
-          src={session ? (session.user?.image as string) : userimage?.src}
+          src={
+            session && session.user?.image
+              ? (session.user?.image as string)
+              : userimage?.src
+          }
           alt="Profile"
           className="object-cover w-full h-full"
         />

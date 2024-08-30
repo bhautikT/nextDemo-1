@@ -1,25 +1,29 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { FaTrash, FaEye } from "react-icons/fa";
+import { FaTrash, FaEye, FaEdit } from "react-icons/fa";
 import defaultImage from "../../../../../public/assets/images.png";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { deleteUserHandler, fetchUsers } from "@/services/authService";
-import { setCurrentPage } from "@/redux/slice/userSlice";
 import useDebounce from "@/hooks/useDebounce";
 import { useSession } from "next-auth/react";
 import Swal from "sweetalert2";
+import { fetchProducts } from "@/services/productService";
+import { setCurrentPage } from "@/redux/slice/productSlice";
 
-const Users = () => {
+const Products = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 500); // 500ms delay
-  const { data: session } = useSession();
-  const UserData = useSelector((state: any) => state.root.signIn.loginData);
 
   const dispatch: AppDispatch = useDispatch();
-  const { users, totalPages, currentPage, loading, error } = useSelector(
-    (state: any) => state.root.users
+  // const { totalPages, currentPage, loading, error } = useSelector(
+  //   (state: any) => state.root.products
+  // );
+  const { products, totalPages, currentPage, loading } = useSelector(
+    (state: any) => state.root.products.products
   );
+
+  console.log(products, totalPages, currentPage, loading, "products");
 
   useEffect(() => {
     if (debouncedSearchQuery !== searchQuery) {
@@ -29,7 +33,7 @@ const Users = () => {
 
   useEffect(() => {
     dispatch(
-      fetchUsers({ page: currentPage, searchQuery: debouncedSearchQuery })
+      fetchProducts({ page: currentPage, searchQuery: debouncedSearchQuery })
     );
   }, [currentPage, debouncedSearchQuery, dispatch]);
 
@@ -56,7 +60,7 @@ const Users = () => {
           });
 
           dispatch(setCurrentPage(1));
-          dispatch(fetchUsers({ page: 1, searchQuery: debouncedSearchQuery }));
+          // dispatch(fetchUsers({ page: 1, searchQuery: debouncedSearchQuery }));
         } else {
           Swal.fire({
             title: "Error!",
@@ -77,7 +81,7 @@ const Users = () => {
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow-lg mt-[14px]">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold text-gray-800">All Users</h1>
+        <h1 className="text-3xl font-semibold text-gray-800">All Products</h1>
         <input
           type="text"
           placeholder="Search..."
@@ -89,23 +93,24 @@ const Users = () => {
 
       {loading ? (
         <p>Loading...</p>
-      ) : error ? (
-        <p>Error: {error}</p>
       ) : (
         <table className="min-w-full bg-white rounded-lg overflow-hidden shadow">
           <thead className="bg-gray-100">
             <tr>
               <th className="py-4 px-6 text-left font-semibold text-gray-600">
-                Name
+                Product Name
               </th>
               <th className="py-4 px-6 text-left font-semibold text-gray-600">
-                Email
+                Category
               </th>
               <th className="py-4 px-6 text-left font-semibold text-gray-600">
-                Profile Image
+                Image
               </th>
               <th className="py-4 px-6 text-left font-semibold text-gray-600">
-                Provider
+                Price
+              </th>
+              <th className="py-4 px-6 text-left font-semibold text-gray-600">
+                Stock
               </th>
               <th className="py-4 px-6 text-left font-semibold text-gray-600">
                 Actions
@@ -113,49 +118,54 @@ const Users = () => {
             </tr>
           </thead>
           <tbody>
-            {users?.map((user: any) => (
-              <tr key={user?.id} className="hover:bg-gray-50">
-                <td className="py-4 px-6  border-gray-200 text-gray-800">
-                  {user?.name}
-                </td>
-                <td className="py-4 px-6  border-gray-200 text-gray-800">
-                  {user?.email}
-                </td>
-                <td className="py-4 px-6  border-gray-200">
-                  <img
-                    src={
-                      user.profile_image?.length > 0 && user?.provider
-                        ? user.profile_image
-                        : defaultImage.src
-                    }
-                    alt={user?.name}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                </td>
-                <td className="py-4 px-6  border-gray-200 text-gray-800">
-                  {user?.provider ? user?.provider : "-"}
-                </td>
-                <td className="py-4 px-6 border-gray-200 flex space-x-4">
-                  {/* <button className="text-blue-500 hover:text-blue-700">
-                    <FaEye size={20} />
-                  </button> */}
-                  {/* <button className="text-green-500 hover:text-green-700">
-                    <FaEdit size={20} />
-                  </button> */}
-                  {!(
-                    session?.user?.email === user?.email ||
-                    UserData?.user?.email === user?.email
-                  ) && (
+            {products?.map((product: any) => {
+              console.log(
+                `${process.env.NEXT_PUBLIC_BASE_URL}${product.image[0]}`,
+                "234"
+              );
+              return (
+                <tr key={product?.id} className="hover:bg-gray-50">
+                  <td className="py-4 px-6  border-gray-200 text-gray-800">
+                    {product?.name}
+                  </td>
+                  <td className="py-4 px-6  border-gray-200 text-gray-800">
+                    {product?.category}
+                  </td>
+                  <td className="py-4 px-6  border-gray-200">
+                    <img
+                      src={
+                        product?.image?.length > 0
+                          ? `${process.env.NEXT_PUBLIC_BASE_URL}${product.image[0]}`
+                          : defaultImage?.src
+                      }
+                      alt={product?.name}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                  </td>
+                  <td className="py-4 px-6  border-gray-200 text-gray-800">
+                    ${product?.price}
+                  </td>
+                  <td className="py-4 px-6  border-gray-200 text-gray-800">
+                    {product?.stock}
+                  </td>
+                  <td className="py-4 px-6 border-gray-200 flex space-x-4">
+                    <button className="text-blue-500 hover:text-blue-700">
+                      <FaEye size={20} />
+                    </button>
+                    <button className="text-green-500 hover:text-green-700">
+                      <FaEdit size={20} />
+                    </button>
+
                     <button
                       className="text-red-500 hover:text-red-700"
-                      onClick={() => DeletePopUp(user?._id)}
+                      onClick={() => DeletePopUp(product?._id)}
                     >
                       <FaTrash size={20} />
                     </button>
-                  )}
-                </td>
-              </tr>
-            ))}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}
@@ -193,4 +203,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default Products;

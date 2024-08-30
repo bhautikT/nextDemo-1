@@ -25,6 +25,7 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
   const handleSignOut = () => {
     if (session) {
       localStorage.removeItem("userSession");
+      dispatch(resetData());
       signOut({ callbackUrl: "/auth/loginPage" });
     } else {
       dispatch(logout());
@@ -75,6 +76,11 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
                 </Link>
               </li>
               <li>
+                <Link href="/products" className={getLinkClass("/products")}>
+                  Products
+                </Link>
+              </li>
+              <li>
                 <Link href="/profile" className={getLinkClass("/profile")}>
                   Profile
                 </Link>
@@ -96,7 +102,9 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
               >
                 <img
                   src={
-                    session ? (session.user?.image as string) : defaultImage.src
+                    session && session.user?.image
+                      ? (session.user?.image as string)
+                      : defaultImage.src
                   }
                   alt="User Image"
                   className="w-8 h-8 rounded-full mr-2"
