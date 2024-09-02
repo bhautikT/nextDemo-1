@@ -47,10 +47,7 @@ const Signup = () => {
     images: [],
   };
 
-  const onSubmit = async (
-    values: SignupFormValues,
-    { resetForm }: { resetForm: () => void }
-  ) => {
+  const onSubmit = async (values: SignupFormValues, { resetForm }: { resetForm: () => void }) => {
     // Create a FormData object
     const formData = new FormData();
     const skillValues = values?.skills?.map((skill) => skill.value);
@@ -66,7 +63,7 @@ const Signup = () => {
 
     // Append skills as a comma-separated string if needed
     formData.append("skills", JSON.stringify(skillValues));
-
+    formData.append("role", "admin");
     // Append images
     values.images.forEach((image) => {
       formData.append("profile_image", image);
@@ -88,9 +85,7 @@ const Signup = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-10">
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8 max-h-screen overflow-y-auto">
-        <h1 className="text-2xl font-bold text-center mb-6 mt-[27px]">
-          Formik Sign Up
-        </h1>
+        <h1 className="text-2xl font-bold text-center mb-6 mt-[27px]">Formik Sign Up</h1>
         <Formik
           initialValues={initialValues}
           validationSchema={signupValidationSchema}
@@ -101,10 +96,7 @@ const Signup = () => {
             <Form className="space-y-4">
               {/* Name Field */}
               <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                   Name
                 </label>
                 <Field
@@ -113,19 +105,12 @@ const Signup = () => {
                   name="name"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
-                <ErrorMessage
-                  name="name"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
-                />
+                <ErrorMessage name="name" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
               {/* Email Field */}
               <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email
                 </label>
                 <Field
@@ -134,19 +119,12 @@ const Signup = () => {
                   name="email"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
-                <ErrorMessage
-                  name="email"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
-                />
+                <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
               {/* Password Field */}
               <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
                 </label>
                 <Field
@@ -185,10 +163,7 @@ const Signup = () => {
 
               {/* Phone Number Field */}
               <div>
-                <label
-                  htmlFor="phoneNumber"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
                   Phone Number
                 </label>
                 <Field
@@ -206,9 +181,7 @@ const Signup = () => {
 
               {/* Gender Radio Buttons */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Gender
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Gender</label>
                 <div className="mt-2 space-y-2">
                   <div className="flex items-center">
                     <Field
@@ -218,10 +191,7 @@ const Signup = () => {
                       value="male"
                       className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
                     />
-                    <label
-                      htmlFor="male"
-                      className="ml-2 block text-sm text-gray-700"
-                    >
+                    <label htmlFor="male" className="ml-2 block text-sm text-gray-700">
                       Male
                     </label>
                   </div>
@@ -233,27 +203,17 @@ const Signup = () => {
                       value="female"
                       className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
                     />
-                    <label
-                      htmlFor="female"
-                      className="ml-2 block text-sm text-gray-700"
-                    >
+                    <label htmlFor="female" className="ml-2 block text-sm text-gray-700">
                       Female
                     </label>
                   </div>
                 </div>
-                <ErrorMessage
-                  name="gender"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
-                />
+                <ErrorMessage name="gender" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
               {/* Skills Multi-Select */}
               <div>
-                <label
-                  htmlFor="skills"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="skills" className="block text-sm font-medium text-gray-700">
                   Skills
                 </label>
                 <Field name="skills">
@@ -270,19 +230,12 @@ const Signup = () => {
                     />
                   )}
                 </Field>
-                <ErrorMessage
-                  name="skills"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
-                />
+                <ErrorMessage name="skills" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
               {/* Multiple Images Upload with Previews */}
               <div>
-                <label
-                  htmlFor="images"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="images" className="block text-sm font-medium text-gray-700">
                   Profile Images (Multi Images)
                 </label>
                 <div className="relative">
@@ -296,9 +249,7 @@ const Signup = () => {
                       if (event.currentTarget.files) {
                         const files = Array.from(event.currentTarget.files);
                         setFieldValue("images", files);
-                        setPreviews(
-                          files.map((file) => URL.createObjectURL(file))
-                        );
+                        setPreviews(files.map((file) => URL.createObjectURL(file)));
                       }
                     }}
                     className="sr-only" // Hide the actual input element
@@ -323,9 +274,7 @@ const Signup = () => {
                         <button
                           type="button"
                           onClick={() => {
-                            const updatedPreviews = previews.filter(
-                              (_, i) => i !== index
-                            );
+                            const updatedPreviews = previews.filter((_, i) => i !== index);
                             setPreviews(updatedPreviews);
                             setFieldValue(
                               "images",
@@ -340,11 +289,7 @@ const Signup = () => {
                     ))}
                   </div>
                 </div>
-                <ErrorMessage
-                  name="images"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
-                />
+                <ErrorMessage name="images" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
               {/* Terms and Conditions Checkbox */}
@@ -358,11 +303,7 @@ const Signup = () => {
                 <label htmlFor="terms" className="ml-2 text-sm text-gray-700">
                   I accept the terms and conditions
                 </label>
-                <ErrorMessage
-                  name="terms"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
-                />
+                <ErrorMessage name="terms" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
               {/* Submit Button */}
