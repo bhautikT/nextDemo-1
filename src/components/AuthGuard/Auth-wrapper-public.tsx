@@ -4,6 +4,7 @@ import { useEffect, ComponentType } from "react";
 //import Loadercomponent from "@/components/common/Loadercomponent";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
+import PageLoader from "../Pageloader";
 
 // // Define a type for the props of the WrappedComponent
 // type WithAuthProps = {
@@ -34,7 +35,11 @@ const withAuthPublic = (WrappedComponent: any) => {
 
     if (isAuthenticated) {
       // Display a loader or any placeholder while the redirection is in progress
-      return <p>loading</p>;
+      return (
+        <p>
+          <PageLoader />{" "}
+        </p>
+      );
     }
 
     // Only mount the wrapped component if authenticated

@@ -10,17 +10,14 @@ import { AppDispatch } from "@/redux/store";
 import { logout } from "@/redux/slice/authSlice";
 import toast from "react-hot-toast";
 import Link from "next/link";
-import {
-  FaApple,
-  FaFacebook,
-  FaGithub,
-  FaGoogle,
-  FaLinkedin,
-  FaTwitter,
-} from "react-icons/fa";
+import { FaApple, FaFacebook, FaGithub, FaGoogle, FaLinkedin, FaTwitter } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import withAuthPublic from "@/components/AuthGuard/Auth-wrapper-public";
+import Spinner from "@/components/Spinner";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import CustomInput from "@/components/CustomeInput";
+import PasswordInput from "@/components/CustomePasswordInput";
 
 const schema = yup.object().shape({
   email: yup
@@ -39,8 +36,14 @@ const schema = yup.object().shape({
 
 function Login() {
   const dispatch: AppDispatch = useDispatch();
+  const { loading } = useSelector((state: any) => state.root.signIn);
   const router = useRouter();
   const { data: session } = useSession();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   // Form setup with react-hook-form and Yup validation
   const {
@@ -89,49 +92,46 @@ function Login() {
           className="w-full max-w-sm mb-8 bg-white p-6 rounded-lg shadow-md"
         >
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              {...register("email")}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            <CustomInput
+              type="text"
+              name="email"
+              label="Email"
+              id="name"
+              //onKeyDown={handleKeyDown}
+              autoComplete="company-name"
+              placeholder="E-mail"
+              register={{ ...register("email") }}
+              error={errors?.email}
             />
-            <p className="text-red-500 text-xs mt-1">{errors.email?.message}</p>
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              {...register("password")}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            <PasswordInput
+              label="Password"
+              id="name"
+              //onKeyDown={handleKeyDown}
+              autoComplete="company-name"
+              placeholder="Password"
+              register={{ ...register("password") }}
+              error={errors?.password}
             />
-            <p className="text-red-500 text-xs mt-1">
-              {errors.password?.message}
-            </p>
           </div>
           <div className="flex justify-between items-center mb-4">
             <button
               type="submit"
+              disabled={loading}
               className="bg-blue-500 text-white py-2 px-4 rounded-md w-full"
             >
-              Sign in
+              {loading ? <Spinner /> : "Sign in"}
             </button>
           </div>
           <Link href="/auth/forgotPassword" className="text-sm text-right">
-            <p className="text-blue-600 font-semibold hover:underline">
-              Forgot Password?
-            </p>
+            <p className="text-blue-600 font-semibold hover:underline">Forgot Password?</p>
           </Link>
           <br />
           <Link href="/auth/signupPage">
             <p className="text-sm mt-1 text-center text-gray-700">
               Don't Have an Account?{" "}
-              <span className="text-blue-600 font-semibold hover:underline">
-                Sign Up
-              </span>
+              <span className="text-blue-600 font-semibold hover:underline">Sign Up</span>
             </p>
           </Link>
         </form>

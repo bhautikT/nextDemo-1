@@ -4,12 +4,14 @@ import React, { useState } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import Select from "react-select";
 import Image from "next/image";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { signInUser } from "@/services/authService";
 import withAuthPublic from "@/components/AuthGuard/Auth-wrapper-public";
 import { AiOutlineClose, AiOutlineCloudUpload } from "react-icons/ai";
 import { signupValidationSchema } from "../../../../../utils/validation/signUpValidation";
 import { AppDispatch } from "@/redux/store";
+import { useRouter } from "next/navigation";
+import Spinner from "@/components/Spinner";
 
 interface SignupFormValues {
   name: string;
@@ -33,7 +35,9 @@ const skillOptions = [
 
 const Signup = () => {
   const [previews, setPreviews] = useState<string[]>([]);
+  const { loading } = useSelector((state: any) => state.root.signIn);
   const dispatch: AppDispatch = useDispatch();
+  const router = useRouter();
 
   const initialValues: SignupFormValues = {
     name: "",
@@ -63,7 +67,6 @@ const Signup = () => {
 
     // Append skills as a comma-separated string if needed
     formData.append("skills", JSON.stringify(skillValues));
-    formData.append("role", "admin");
     // Append images
     values.images.forEach((image) => {
       formData.append("profile_image", image);
@@ -73,6 +76,7 @@ const Signup = () => {
       const response = await dispatch(signInUser(formData)).unwrap();
       // Handle success
       console.log("Success:", response);
+      router.push("/auth/loginPage");
     } catch (error) {
       // Handle error
       console.error("Error:", error);
@@ -310,9 +314,10 @@ const Signup = () => {
               <div>
                 <button
                   type="submit"
+                  disabled={loading}
                   className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
-                  Sign Up
+                  {loading ? <Spinner /> : "Sign Up"}
                 </button>
               </div>
             </Form>

@@ -42,13 +42,11 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
     const baseClass = "block py-2 px-4 rounded transition-all duration-300";
     const activeClass = "bg-gray-700 text-white";
     const inactiveClass = "hover:bg-gray-700 text-gray-300";
-    return pathname === path
-      ? `${baseClass} ${activeClass}`
-      : `${baseClass} ${inactiveClass}`;
+    return pathname === path ? `${baseClass} ${activeClass}` : `${baseClass} ${inactiveClass}`;
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-full">
       {/* Sidebar */}
       <aside
         className={`transition-transform duration-300 ease-in-out ${
