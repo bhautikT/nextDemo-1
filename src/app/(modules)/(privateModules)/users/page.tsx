@@ -28,7 +28,9 @@ const Users = () => {
   }, [debouncedSearchQuery, dispatch, searchQuery]);
 
   useEffect(() => {
-    dispatch(fetchUsers({ page: currentPage, searchQuery: debouncedSearchQuery }));
+    dispatch(
+      fetchUsers({ page: currentPage, searchQuery: debouncedSearchQuery })
+    );
   }, [currentPage, debouncedSearchQuery, dispatch]);
 
   const DeletePopUp = async (id: string) => {
@@ -93,18 +95,32 @@ const Users = () => {
         <table className="min-w-full bg-white rounded-lg overflow-hidden shadow">
           <thead className="bg-gray-100">
             <tr>
-              <th className="py-4 px-6 text-left font-semibold text-gray-600">Name</th>
-              <th className="py-4 px-6 text-left font-semibold text-gray-600">Email</th>
-              <th className="py-4 px-6 text-left font-semibold text-gray-600">Profile Image</th>
-              <th className="py-4 px-6 text-left font-semibold text-gray-600">Provider</th>
-              <th className="py-4 px-6 text-left font-semibold text-gray-600">Actions</th>
+              <th className="py-4 px-6 text-left font-semibold text-gray-600">
+                Name
+              </th>
+              <th className="py-4 px-6 text-left font-semibold text-gray-600">
+                Email
+              </th>
+              <th className="py-4 px-6 text-left font-semibold text-gray-600">
+                Profile Image
+              </th>
+              <th className="py-4 px-6 text-left font-semibold text-gray-600">
+                Provider
+              </th>
+              <th className="py-4 px-6 text-left font-semibold text-gray-600">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
             {users?.map((user: any) => (
               <tr key={user?.id} className="hover:bg-gray-50">
-                <td className="py-4 px-6  border-gray-200 text-gray-800">{user?.name}</td>
-                <td className="py-4 px-6  border-gray-200 text-gray-800">{user?.email}</td>
+                <td className="py-4 px-6  border-gray-200 text-gray-800">
+                  {user?.name}
+                </td>
+                <td className="py-4 px-6  border-gray-200 text-gray-800">
+                  {user?.email}
+                </td>
                 <td className="py-4 px-6  border-gray-200">
                   <img
                     src={
@@ -127,7 +143,8 @@ const Users = () => {
                     <FaEdit size={20} />
                   </button> */}
                   {!(
-                    session?.user?.email === user?.email || UserData?.user?.email === user?.email
+                    session?.user?.email === user?.email ||
+                    UserData?.user?.email === user?.email
                   ) && (
                     <button
                       className="text-red-500 hover:text-red-700"
@@ -145,7 +162,7 @@ const Users = () => {
 
       <div className="mt-6 flex justify-between items-center">
         <button
-          onClick={() => dispatch(setCurrentPage(Math.max(currentPage - 1, 1)))}
+          onClick={() => dispatch(setCurrentPage(currentPage - 1))}
           className={`px-4 py-2 rounded ${
             currentPage === 1
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -159,7 +176,7 @@ const Users = () => {
           Page {currentPage} of {totalPages}
         </span>
         <button
-          onClick={() => dispatch(setCurrentPage(Math.min(currentPage + 1, totalPages)))}
+          onClick={() => dispatch(setCurrentPage(currentPage + 1))}
           className={`px-4 py-2 rounded ${
             currentPage === totalPages
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"

@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { LoginUser, signInUser } from "@/services/authService";
 import toast from "react-hot-toast";
-import { fetchProducts } from "@/services/productService";
+import { fetchProducts, getSingleProduct } from "@/services/productService";
 
 interface ProductsState {
   products: Array<object>;
+  singleProduct: Object;
   loading: boolean;
   totalPages: number;
   currentPage: number;
@@ -12,6 +13,7 @@ interface ProductsState {
 
 const initialState: ProductsState = {
   products: [],
+  singleProduct: {},
   loading: false,
   totalPages: 1,
   currentPage: 1,
@@ -26,6 +28,8 @@ const productSlice = createSlice({
     },
     resetProductData: (state) => {
       state.products = [];
+      state.singleProduct = {};
+
       state.loading = false;
       state.totalPages = 1;
       state.currentPage = 1;
@@ -42,6 +46,16 @@ const productSlice = createSlice({
         state.totalPages = action.payload.totalPages || 1;
       })
       .addCase(fetchProducts.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(getSingleProduct.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getSingleProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.singleProduct = action.payload;
+      })
+      .addCase(getSingleProduct.rejected, (state) => {
         state.loading = false;
       });
   },

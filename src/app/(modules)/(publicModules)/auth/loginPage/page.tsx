@@ -10,7 +10,14 @@ import { AppDispatch } from "@/redux/store";
 import { logout } from "@/redux/slice/authSlice";
 import toast from "react-hot-toast";
 import Link from "next/link";
-import { FaApple, FaFacebook, FaGithub, FaGoogle, FaLinkedin, FaTwitter } from "react-icons/fa";
+import {
+  FaApple,
+  FaFacebook,
+  FaGithub,
+  FaGoogle,
+  FaLinkedin,
+  FaTwitter,
+} from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import withAuthPublic from "@/components/AuthGuard/Auth-wrapper-public";
@@ -65,16 +72,12 @@ function Login() {
     console.log(data, "datatatata");
     try {
       const response = await dispatch(LoginUser(data));
-      // Handle success
       console.log("Success:", response);
       if (LoginUser.rejected.match(response)) {
-        // Handle the rejected case
         router.push("/auth/loginPage");
       } else if (LoginUser.fulfilled.match(response)) {
-        // Handle the fulfilled case
         router.push("/profile");
       }
-      // toast.success("login successfully");
     } catch (error) {
       // Handle error
       toast.error("something went wrong");
@@ -125,13 +128,17 @@ function Login() {
             </button>
           </div>
           <Link href="/auth/forgotPassword" className="text-sm text-right">
-            <p className="text-blue-600 font-semibold hover:underline">Forgot Password?</p>
+            <p className="text-blue-600 font-semibold hover:underline">
+              Forgot Password?
+            </p>
           </Link>
           <br />
           <Link href="/auth/signupPage">
             <p className="text-sm mt-1 text-center text-gray-700">
               Don't Have an Account?{" "}
-              <span className="text-blue-600 font-semibold hover:underline">Sign Up</span>
+              <span className="text-blue-600 font-semibold hover:underline">
+                Sign Up
+              </span>
             </p>
           </Link>
         </form>

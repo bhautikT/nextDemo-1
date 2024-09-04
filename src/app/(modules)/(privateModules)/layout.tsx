@@ -11,6 +11,7 @@ import { logout } from "@/redux/slice/authSlice";
 import defaultImage from "../../../../public/assets/images.png";
 import dashboardIcon from "../../../../public/assets/dashboardIcon.png";
 import { resetData } from "@/redux/slice/userSlice";
+import { resetProductData } from "@/redux/slice/productSlice";
 
 function DefaultLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
@@ -26,10 +27,13 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
     if (session) {
       localStorage.removeItem("userSession");
       dispatch(resetData());
+      dispatch(resetProductData());
       signOut({ callbackUrl: "/auth/loginPage" });
     } else {
       dispatch(logout());
       dispatch(resetData());
+      dispatch(resetProductData());
+
       router.push("/auth/loginPage");
     }
   };

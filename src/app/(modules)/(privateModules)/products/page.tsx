@@ -6,22 +6,30 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { deleteUserHandler, fetchUsers } from "@/services/authService";
 import useDebounce from "@/hooks/useDebounce";
-import { useSession } from "next-auth/react";
 import Swal from "sweetalert2";
-import { fetchProducts } from "@/services/productService";
+import {
+  deleteProductHandler,
+  fetchProducts,
+  getSingleProduct,
+} from "@/services/productService";
 import { setCurrentPage } from "@/redux/slice/productSlice";
+import { useRouter } from "next/navigation";
+import ProductModal from "@/components/ProductModal";
 
 const Products = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
   const debouncedSearchQuery = useDebounce(searchQuery, 500); // 500ms delay
+  // const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { singleProduct } = useSelector((state: any) => state.root.products);
 
   const dispatch: AppDispatch = useDispatch();
-  // const { totalPages, currentPage, loading, error } = useSelector(
-  //   (state: any) => state.root.products
-  // );
-  const { products, totalPages, currentPage, loading } = useSelector(
+
+  const { products, totalPages, loading } = useSelector(
     (state: any) => state.root.products.products
   );
+  const { currentPage } = useSelector((state: any) => state.root.products);
 
   console.log(products, totalPages, currentPage, loading, "products");
 
@@ -50,7 +58,7 @@ const Products = () => {
 
     if (result.isConfirmed) {
       try {
-        const deleteResult = await dispatch(deleteUserHandler(id));
+        const deleteResult = await dispatch(deleteProductHandler(id));
 
         if (deleteResult.meta.requestStatus === "fulfilled") {
           Swal.fire({
@@ -60,7 +68,9 @@ const Products = () => {
           });
 
           dispatch(setCurrentPage(1));
-          // dispatch(fetchUsers({ page: 1, searchQuery: debouncedSearchQuery }));
+          dispatch(
+            fetchProducts({ page: 1, searchQuery: debouncedSearchQuery })
+          );
         } else {
           Swal.fire({
             title: "Error!",
@@ -78,17 +88,31 @@ const Products = () => {
     }
   };
 
+  const handleViewProduct = async (id: string) => {
+    await dispatch(getSingleProduct(id));
+
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow-lg mt-[14px]">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-semibold text-gray-800">All Products</h1>
-        <input
-          type="text"
-          placeholder="Search..."
-          className="border border-gray-300 rounded-lg px-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+        <div className="flex space-x-4 items-center">
+          <button
+            onClick={() => router.push("/products/addProducts")}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
+          >
+            + Add Product
+          </button>
+          <input
+            type="text"
+            placeholder="Search..."
+            className="border border-gray-300 rounded-lg px-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
 
       {loading ? (
@@ -119,10 +143,6 @@ const Products = () => {
           </thead>
           <tbody>
             {products?.map((product: any) => {
-              console.log(
-                `${process.env.NEXT_PUBLIC_BASE_URL}${product.image[0]}`,
-                "234"
-              );
               return (
                 <tr key={product?.id} className="hover:bg-gray-50">
                   <td className="py-4 px-6  border-gray-200 text-gray-800">
@@ -149,10 +169,18 @@ const Products = () => {
                     {product?.stock}
                   </td>
                   <td className="py-4 px-6 border-gray-200 flex space-x-4">
-                    <button className="text-blue-500 hover:text-blue-700">
+                    <button
+                      className="text-blue-500 hover:text-blue-700"
+                      onClick={() => handleViewProduct(product?._id)}
+                    >
                       <FaEye size={20} />
                     </button>
-                    <button className="text-green-500 hover:text-green-700">
+                    <button
+                      className="text-green-500 hover:text-green-700"
+                      onClick={() =>
+                        router.push(`/products/editProducts/${product?._id}`)
+                      }
+                    >
                       <FaEdit size={20} />
                     </button>
 
@@ -170,9 +198,15 @@ const Products = () => {
         </table>
       )}
 
+      <ProductModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        product={singleProduct}
+      />
+
       <div className="mt-6 flex justify-between items-center">
         <button
-          onClick={() => dispatch(setCurrentPage(Math.max(currentPage - 1, 1)))}
+          onClick={() => dispatch(setCurrentPage(currentPage - 1))}
           className={`px-4 py-2 rounded ${
             currentPage === 1
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -186,9 +220,7 @@ const Products = () => {
           Page {currentPage} of {totalPages}
         </span>
         <button
-          onClick={() =>
-            dispatch(setCurrentPage(Math.min(currentPage + 1, totalPages)))
-          }
+          onClick={() => dispatch(setCurrentPage(currentPage + 1))}
           className={`px-4 py-2 rounded ${
             currentPage === totalPages
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
