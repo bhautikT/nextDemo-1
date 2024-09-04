@@ -162,7 +162,7 @@ const Users = () => {
 
       <div className="mt-6 flex justify-between items-center">
         <button
-          onClick={() => dispatch(setCurrentPage(Math.max(currentPage - 1, 1)))}
+          onClick={() => dispatch(setCurrentPage(currentPage - 1))}
           className={`px-4 py-2 rounded ${
             currentPage === 1
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -176,9 +176,7 @@ const Users = () => {
           Page {currentPage} of {totalPages}
         </span>
         <button
-          onClick={() =>
-            dispatch(setCurrentPage(Math.min(currentPage + 1, totalPages)))
-          }
+          onClick={() => dispatch(setCurrentPage(currentPage + 1))}
           className={`px-4 py-2 rounded ${
             currentPage === totalPages
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"

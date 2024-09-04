@@ -8,6 +8,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import userimage from "../../../../../public/assets/images.png";
 import { resetData } from "@/redux/slice/userSlice";
+import { resetProductData } from "@/redux/slice/productSlice";
 
 function User() {
   const { data: session } = useSession();
@@ -19,10 +20,13 @@ function User() {
     if (session) {
       localStorage.removeItem("userSession");
       dispatch(resetData());
+      dispatch(resetProductData());
+
       signOut({ callbackUrl: "/auth/loginPage" });
     } else {
       dispatch(logout());
       dispatch(resetData());
+      dispatch(resetProductData());
       router.push("/auth/loginPage");
     }
   };
