@@ -1,36 +1,37 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { FaTrash, FaEye, FaEdit } from "react-icons/fa";
-import defaultImage from "../../../../../public/assets/images.png";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import useDebounce from "@/hooks/useDebounce";
 import Swal from "sweetalert2";
-import {
-  deleteProductHandler,
-  fetchProducts,
-  getSingleProduct,
-} from "@/services/productService";
-import { setCurrentPage } from "@/redux/slice/productSlice";
 import { useRouter } from "next/navigation";
+import {
+  deleteCategoryHandler,
+  fetchCategories,
+  getSingleCategory,
+} from "@/services/categoryService";
+import { setCurrentPage } from "@/redux/slice/categorySlice";
 import Modal from "@/components/Modal";
 
-const Products = () => {
+const Categories = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
-  const debouncedSearchQuery = useDebounce(searchQuery, 500); // 500ms delay
-  // const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { singleProduct } = useSelector((state: any) => state.root.products);
+  const { singleCategory } = useSelector((state: any) => state.root.categories);
+
+  console.log(singleCategory, "singleCategory");
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { products, totalPages, loading } = useSelector(
-    (state: any) => state.root.products.products
+  const { categories, totalPages, loading } = useSelector(
+    (state: any) => state.root.categories.allCategoriesData
   );
-  const { currentPage } = useSelector((state: any) => state.root.products);
 
-  console.log(products, totalPages, currentPage, loading, "products");
+  const { currentPage } = useSelector((state: any) => state.root.categories);
+
+  console.log(categories, totalPages, currentPage, loading, "categories");
 
   useEffect(() => {
     if (debouncedSearchQuery !== searchQuery) {
@@ -40,7 +41,7 @@ const Products = () => {
 
   useEffect(() => {
     dispatch(
-      fetchProducts({ page: currentPage, searchQuery: debouncedSearchQuery })
+      fetchCategories({ page: currentPage, searchQuery: debouncedSearchQuery })
     );
   }, [currentPage, debouncedSearchQuery, dispatch]);
 
@@ -57,7 +58,7 @@ const Products = () => {
 
     if (result.isConfirmed) {
       try {
-        const deleteResult = await dispatch(deleteProductHandler(id));
+        const deleteResult = await dispatch(deleteCategoryHandler(id));
 
         if (deleteResult.meta.requestStatus === "fulfilled") {
           Swal.fire({
@@ -68,7 +69,7 @@ const Products = () => {
 
           dispatch(setCurrentPage(1));
           dispatch(
-            fetchProducts({ page: 1, searchQuery: debouncedSearchQuery })
+            fetchCategories({ page: 1, searchQuery: debouncedSearchQuery })
           );
         } else {
           Swal.fire({
@@ -87,8 +88,8 @@ const Products = () => {
     }
   };
 
-  const handleViewProduct = async (id: string) => {
-    await dispatch(getSingleProduct(id));
+  const handleViewCategory = async (id: string) => {
+    await dispatch(getSingleCategory(id));
 
     setIsModalOpen(true);
   };
@@ -96,13 +97,13 @@ const Products = () => {
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow-lg mt-[14px]">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold text-gray-800">All Products</h1>
+        <h1 className="text-3xl font-semibold text-gray-800">All Categories</h1>
         <div className="flex space-x-4 items-center">
           <button
-            onClick={() => router.push("/products/addProducts")}
+            onClick={() => router.push("/categories/addCategory")}
             className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
           >
-            + Add Product
+            + Add Category
           </button>
           <input
             type="text"
@@ -121,19 +122,13 @@ const Products = () => {
           <thead className="bg-gray-100">
             <tr>
               <th className="py-4 px-6 text-left font-semibold text-gray-600">
-                Product Name
+                Category Name
               </th>
               <th className="py-4 px-6 text-left font-semibold text-gray-600">
-                Category
+                Description
               </th>
               <th className="py-4 px-6 text-left font-semibold text-gray-600">
-                Image
-              </th>
-              <th className="py-4 px-6 text-left font-semibold text-gray-600">
-                Price
-              </th>
-              <th className="py-4 px-6 text-left font-semibold text-gray-600">
-                Stock
+                Status
               </th>
               <th className="py-4 px-6 text-left font-semibold text-gray-600">
                 Actions
@@ -141,43 +136,33 @@ const Products = () => {
             </tr>
           </thead>
           <tbody>
-            {products?.map((product: any) => {
+            {categories?.map((category: any) => {
               return (
-                <tr key={product?.id} className="hover:bg-gray-50">
+                <tr key={category?.id} className="hover:bg-gray-50">
                   <td className="py-4 px-6  border-gray-200 text-gray-800">
-                    {product?.name}
+                    {category?.name}
                   </td>
                   <td className="py-4 px-6  border-gray-200 text-gray-800">
-                    {product?.category ? product?.category?.name : "-"}
+                    {category?.description}
                   </td>
-                  <td className="py-4 px-6  border-gray-200">
-                    <img
-                      src={
-                        product?.image?.length > 0
-                          ? `${process.env.NEXT_PUBLIC_BASE_URL}${product.image[0]}`
-                          : defaultImage?.src
-                      }
-                      alt={product?.name}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                  </td>
-                  <td className="py-4 px-6  border-gray-200 text-gray-800">
-                    ${product?.price}
-                  </td>
-                  <td className="py-4 px-6  border-gray-200 text-gray-800">
-                    {product?.stock}
+                  <td
+                    className={`py-4 px-6 border-gray-200 font-semibold ${
+                      category?.isActive ? "text-green-500" : "text-red-500"
+                    }`}
+                  >
+                    {category?.isActive ? "Active" : "InActive"}
                   </td>
                   <td className="py-4 px-6 border-gray-200 flex space-x-4">
                     <button
                       className="text-blue-500 hover:text-blue-700"
-                      onClick={() => handleViewProduct(product?._id)}
+                      onClick={() => handleViewCategory(category?._id)}
                     >
                       <FaEye size={20} />
                     </button>
                     <button
                       className="text-green-500 hover:text-green-700"
                       onClick={() =>
-                        router.push(`/products/editProducts/${product?._id}`)
+                        router.push(`/categories/editCategory/${category?._id}`)
                       }
                     >
                       <FaEdit size={20} />
@@ -185,7 +170,7 @@ const Products = () => {
 
                     <button
                       className="text-red-500 hover:text-red-700"
-                      onClick={() => DeletePopUp(product?._id)}
+                      onClick={() => DeletePopUp(category?._id)}
                     >
                       <FaTrash size={20} />
                     </button>
@@ -200,8 +185,7 @@ const Products = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        data={singleProduct}
-        isProduct={true}
+        data={singleCategory}
       />
 
       <div className="mt-6 flex justify-between items-center">
@@ -235,4 +219,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default Categories;

@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 
-const protectedRoutes = ["/dashboard", "/profile", "/users", "/products"];
+const protectedRoutes = [
+  "/dashboard",
+  "/profile",
+  "/users",
+  "/products",
+  "/categories",
+];
 
 export default function middleware(req: any) {
   //get token

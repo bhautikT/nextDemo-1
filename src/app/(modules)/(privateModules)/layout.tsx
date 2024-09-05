@@ -9,9 +9,10 @@ import { AppDispatch } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/redux/slice/authSlice";
 import defaultImage from "../../../../public/assets/images.png";
-import dashboardIcon from "../../../../public/assets/dashboardIcon.png";
+import dashboardIcon from "../../../../public/assets/dashboardIcon.svg";
 import { resetData } from "@/redux/slice/userSlice";
 import { resetProductData } from "@/redux/slice/productSlice";
+import { resetCategoryData } from "@/redux/slice/categorySlice";
 
 function DefaultLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
@@ -28,11 +29,13 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
       localStorage.removeItem("userSession");
       dispatch(resetData());
       dispatch(resetProductData());
+      dispatch(resetCategoryData());
       signOut({ callbackUrl: "/auth/loginPage" });
     } else {
       dispatch(logout());
       dispatch(resetData());
       dispatch(resetProductData());
+      dispatch(resetCategoryData());
 
       router.push("/auth/loginPage");
     }
@@ -46,7 +49,9 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
     const baseClass = "block py-2 px-4 rounded transition-all duration-300";
     const activeClass = "bg-gray-700 text-white";
     const inactiveClass = "hover:bg-gray-700 text-gray-300";
-    return pathname === path ? `${baseClass} ${activeClass}` : `${baseClass} ${inactiveClass}`;
+    return pathname === path
+      ? `${baseClass} ${activeClass}`
+      : `${baseClass} ${inactiveClass}`;
   };
 
   return (
@@ -57,7 +62,7 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
           isSidebarOpen ? "w-64" : "w-20"
         } bg-gradient-to-r from-gray-800 to-gray-600 text-white h-full overflow-hidden`}
       >
-        <div className="p-4">
+        <div className="p-4 m-[25px]">
           <h1
             className={`text-xl font-bold transition-opacity duration-300 ${
               isSidebarOpen ? "opacity-100" : "opacity-0"
@@ -75,6 +80,14 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
               <li>
                 <Link href="/users" className={getLinkClass("/users")}>
                   Users
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/categories"
+                  className={getLinkClass("/categories")}
+                >
+                  Categories
                 </Link>
               </li>
               <li>

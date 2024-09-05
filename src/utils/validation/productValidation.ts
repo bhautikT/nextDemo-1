@@ -29,9 +29,7 @@ export const productValidationSchema = Yup.object({
     .min(1, "Stock must be at least 1")
     .max(1000, "Stock cannot exceed 1000")
     .required("Stock is required"),
-  category: Yup.string()
-    // .oneOf(validCategories, "Invalid category")
-    .required("Category is required"),
+  category: Yup.string().required("Category is required"),
   images: Yup.array()
     .of(
       Yup.mixed()

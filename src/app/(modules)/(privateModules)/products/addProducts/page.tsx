@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import Select from "react-select";
 import Image from "next/image";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addProducts } from "@/services/productService";
 import { AppDispatch } from "@/redux/store";
 import { productValidationSchema } from "@/utils/validation/productValidation";
 import { useRouter } from "next/navigation";
 import { AiOutlineClose, AiOutlineCloudUpload } from "react-icons/ai";
+import { GetAllCategories } from "@/services/categoryService";
 
 interface ProductsFormValues {
   name: string;
@@ -20,17 +21,20 @@ interface ProductsFormValues {
   images: File[];
 }
 
-const productCategoryOptions = [
-  { value: "electronics", label: "Electronics" },
-  { value: "clothes", label: "Clothes" },
-  { value: "furnichar", label: "Furnichar" },
-  { value: "stationary", label: "Stationary" },
-];
-
 const AddProduct = () => {
   const [previews, setPreviews] = useState<string[]>([]);
   const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
+  const GetAllCategory = useSelector((state: any) => state.root.categories);
+  console.log(GetAllCategory, "GetAllCategory");
+  const productCategoryOptions = GetAllCategory.categories.map(
+    (category: any) => ({
+      value: category._id,
+      label: category.name,
+    })
+  );
+
+  console.log(GetAllCategory, "GetAllCategory");
 
   const initialValues: ProductsFormValues = {
     name: "",
@@ -40,6 +44,10 @@ const AddProduct = () => {
     stock: "",
     images: [],
   };
+
+  useEffect(() => {
+    dispatch(GetAllCategories());
+  }, []);
 
   const onSubmit = async (
     values: ProductsFormValues,
@@ -178,7 +186,7 @@ const AddProduct = () => {
                         id="category"
                         options={productCategoryOptions}
                         value={productCategoryOptions.find(
-                          (option) => option.value === field.value
+                          (option: any) => option.value === field.value
                         )}
                         onChange={(selectedOption: any) => {
                           setFieldValue(

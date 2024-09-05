@@ -14,6 +14,7 @@ import { AppDispatch } from "@/redux/store";
 import { productValidationSchema } from "@/utils/validation/productValidation";
 import { useParams, useRouter } from "next/navigation";
 import { AiOutlineClose, AiOutlineCloudUpload } from "react-icons/ai";
+import { GetAllCategories } from "@/services/categoryService";
 
 interface ProductsFormValues {
   name: string;
@@ -24,16 +25,16 @@ interface ProductsFormValues {
   images: File[];
 }
 
-const productCategoryOptions = [
-  { value: "electronics", label: "Electronics" },
-  { value: "clothes", label: "Clothes" },
-  { value: "furnichar", label: "Furnichar" },
-  { value: "stationary", label: "Stationary" },
-];
-
 const EditProduct = () => {
   const [previews, setPreviews] = useState<string[]>([]);
   const { singleProduct } = useSelector((state: any) => state.root.products);
+  const GetAllCategory = useSelector((state: any) => state.root.categories);
+  const productCategoryOptions = GetAllCategory.categories.map(
+    (category: any) => ({
+      value: category._id,
+      label: category.name,
+    })
+  );
 
   const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
@@ -41,15 +42,18 @@ const EditProduct = () => {
 
   useEffect(() => {
     dispatch(getSingleProduct(id));
+    dispatch(GetAllCategories());
   }, [dispatch, id]);
 
   useEffect(() => {
     if (singleProduct) {
       setInitialValues({
-        name: singleProduct.product.name || "",
-        description: singleProduct.product.description || "",
-        price: singleProduct.product.price.toString() || "",
-        category: singleProduct.product.category || "",
+        name: singleProduct?.product?.name || "",
+        description: singleProduct?.product?.description || "",
+        price: singleProduct?.product?.price.toString() || "",
+        category: singleProduct?.product?.category
+          ? singleProduct?.product?.category?._id
+          : "",
         stock: singleProduct.product.stock.toString() || "",
         images: [],
       });
@@ -215,7 +219,7 @@ const EditProduct = () => {
                           id="category"
                           options={productCategoryOptions}
                           value={productCategoryOptions.find(
-                            (option) => option.value === field.value
+                            (option: any) => option.value === field.value
                           )}
                           onChange={(selectedOption: any) => {
                             setFieldValue(

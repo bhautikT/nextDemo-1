@@ -1,6 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { LoginUser, signInUser } from "@/services/authService";
-import toast from "react-hot-toast";
 import { fetchProducts, getSingleProduct } from "@/services/productService";
 
 interface ProductsState {

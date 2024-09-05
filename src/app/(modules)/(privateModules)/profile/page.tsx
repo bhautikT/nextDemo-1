@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import userimage from "../../../../../public/assets/images.png";
 import { resetData } from "@/redux/slice/userSlice";
 import { resetProductData } from "@/redux/slice/productSlice";
+import { resetCategoryData } from "@/redux/slice/categorySlice";
 
 function User() {
   const { data: session } = useSession();
@@ -21,12 +22,15 @@ function User() {
       localStorage.removeItem("userSession");
       dispatch(resetData());
       dispatch(resetProductData());
+      dispatch(resetCategoryData());
 
       signOut({ callbackUrl: "/auth/loginPage" });
     } else {
       dispatch(logout());
       dispatch(resetData());
       dispatch(resetProductData());
+      dispatch(resetCategoryData());
+
       router.push("/auth/loginPage");
     }
   };
