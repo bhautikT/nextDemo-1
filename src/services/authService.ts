@@ -37,6 +37,23 @@ export const LoginUser = createAsyncThunk(
   }
 );
 
+export const SocialLoginUser = createAsyncThunk(
+  "auth/SocialLoginUser",
+  async (data: { email: string }, { rejectWithValue }) => {
+    try {
+      const response = await AxiosDefaultSetting({
+        method: "POST",
+        data: data,
+        url: "/auth/sociaLogin",
+        contentType: "application/json", // Ensure content type is set for FormData
+      });
+      return response.data.data;
+    } catch (error: any) {
+      console.log(error, "error");
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
 export const forgotPasswordHandler = createAsyncThunk(
   "auth/forgotPassword",
   async (data: { email: string }, { rejectWithValue }) => {

@@ -14,7 +14,7 @@ import { categoryValidationSchema } from "@/utils/validation/categoryValidation"
 interface CategoryFormValues {
   name: string;
   description: string;
-  isActive: string; // Store as string ("true" or "false")
+  isActive: string;
 }
 
 const EditCategory = () => {

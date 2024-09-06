@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useDispatch, useSelector } from "react-redux";
-import { LoginUser } from "@/services/authService";
+import { LoginUser, SocialLoginUser } from "@/services/authService";
 import { AppDispatch } from "@/redux/store";
 import { logout } from "@/redux/slice/authSlice";
 import toast from "react-hot-toast";
@@ -63,16 +63,19 @@ function Login() {
 
   useEffect(() => {
     if (session) {
+      const data: any = {
+        email: session.user?.email,
+      };
+
+      dispatch(SocialLoginUser(data));
       localStorage.setItem("userSession", JSON.stringify(session));
       router.push("/profile");
     }
   }, [session]);
 
   const onSubmit = async (data: { email: string; password: string }) => {
-    console.log(data, "datatatata");
     try {
       const response = await dispatch(LoginUser(data));
-      console.log("Success:", response);
       if (LoginUser.rejected.match(response)) {
         router.push("/auth/loginPage");
       } else if (LoginUser.fulfilled.match(response)) {

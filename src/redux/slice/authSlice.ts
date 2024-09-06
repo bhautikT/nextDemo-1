@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { LoginUser, signInUser } from "@/services/authService";
+import { LoginUser, signInUser, SocialLoginUser } from "@/services/authService";
 import toast from "react-hot-toast";
 
 interface AuthState {
-  user: string;
+  socialLoginUserData: object;
+  user: object;
   loginData: object;
   loading: boolean;
   error?: string;
@@ -11,7 +12,8 @@ interface AuthState {
 
 const initialState: AuthState = {
   loginData: {},
-  user: "bhautik",
+  user: {},
+  socialLoginUserData: {},
   loading: false,
 };
 
@@ -20,7 +22,8 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     logout: (state) => {
-      state.user = "";
+      state.socialLoginUserData = {};
+      state.user = {};
       state.loginData = {};
       localStorage.removeItem("userSession");
     },
@@ -37,7 +40,7 @@ const authSlice = createSlice({
         } else {
           toast.success(action.payload?.message || "Registration successful");
         }
-        state.user = action.payload?.user || ""; // Update with the user data if available
+        state.user = action.payload?.user || "";
       })
       .addCase(signInUser.rejected, (state, action) => {
         state.loading = false;
@@ -54,9 +57,26 @@ const authSlice = createSlice({
         } else {
           toast.success(action.payload?.message || "Login successful");
         }
-        state.loginData = action.payload; // Update with the user data if available
+        state.loginData = action.payload;
       })
       .addCase(LoginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        toast.error(state.error || "An error occurred");
+      })
+      .addCase(SocialLoginUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(SocialLoginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        if (action.payload?.status === false) {
+          toast.error(action.payload?.message || "Error occurred");
+        } else {
+          console.log(action.payload?.message);
+        }
+        state.socialLoginUserData = action.payload;
+      })
+      .addCase(SocialLoginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
         toast.error(state.error || "An error occurred");

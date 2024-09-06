@@ -28,6 +28,7 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
     if (session) {
       localStorage.removeItem("userSession");
       dispatch(resetData());
+      dispatch(logout());
       dispatch(resetProductData());
       dispatch(resetCategoryData());
       signOut({ callbackUrl: "/auth/loginPage" });

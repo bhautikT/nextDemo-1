@@ -23,6 +23,7 @@ function User() {
       dispatch(resetData());
       dispatch(resetProductData());
       dispatch(resetCategoryData());
+      dispatch(logout());
 
       signOut({ callbackUrl: "/auth/loginPage" });
     } else {
