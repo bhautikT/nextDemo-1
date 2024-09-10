@@ -22,6 +22,10 @@ const Products = () => {
   // const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { singleProduct } = useSelector((state: any) => state.root.products);
+  const User = useSelector((state: any) => state.root.signIn);
+  const SocialUserToken = User?.socialLoginUserData?.token;
+  const UserToken = User?.loginData?.token;
+  const Token = SocialUserToken || UserToken;
 
   const dispatch: AppDispatch = useDispatch();
 
@@ -40,11 +44,15 @@ const Products = () => {
 
   useEffect(() => {
     dispatch(
-      fetchProducts({ page: currentPage, searchQuery: debouncedSearchQuery })
+      fetchProducts({
+        page: currentPage,
+        searchQuery: debouncedSearchQuery,
+        token: Token,
+      })
     );
   }, [currentPage, debouncedSearchQuery, dispatch]);
 
-  const DeletePopUp = async (id: string) => {
+  const deletePopUp = async (id: string) => {
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -57,7 +65,9 @@ const Products = () => {
 
     if (result.isConfirmed) {
       try {
-        const deleteResult = await dispatch(deleteProductHandler(id));
+        const deleteResult = await dispatch(
+          deleteProductHandler({ id, token: Token })
+        );
 
         if (deleteResult.meta.requestStatus === "fulfilled") {
           Swal.fire({
@@ -68,7 +78,11 @@ const Products = () => {
 
           dispatch(setCurrentPage(1));
           dispatch(
-            fetchProducts({ page: 1, searchQuery: debouncedSearchQuery })
+            fetchProducts({
+              page: 1,
+              searchQuery: debouncedSearchQuery,
+              token: Token,
+            })
           );
         } else {
           Swal.fire({
@@ -88,7 +102,7 @@ const Products = () => {
   };
 
   const handleViewProduct = async (id: string) => {
-    await dispatch(getSingleProduct(id));
+    await dispatch(getSingleProduct({ id, token: Token }));
 
     setIsModalOpen(true);
   };
@@ -185,7 +199,7 @@ const Products = () => {
 
                     <button
                       className="text-red-500 hover:text-red-700"
-                      onClick={() => DeletePopUp(product?._id)}
+                      onClick={() => deletePopUp(product?._id)}
                     >
                       <FaTrash size={20} />
                     </button>

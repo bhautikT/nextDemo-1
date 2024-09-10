@@ -69,7 +69,7 @@ function Login() {
 
       dispatch(SocialLoginUser(data));
       localStorage.setItem("userSession", JSON.stringify(session));
-      router.push("/profile");
+      router.push("/users");
     }
   }, [session]);
 
@@ -79,7 +79,7 @@ function Login() {
       if (LoginUser.rejected.match(response)) {
         router.push("/auth/loginPage");
       } else if (LoginUser.fulfilled.match(response)) {
-        router.push("/profile");
+        router.push("/users");
       }
     } catch (error) {
       // Handle error

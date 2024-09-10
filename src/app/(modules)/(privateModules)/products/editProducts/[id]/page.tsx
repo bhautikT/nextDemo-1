@@ -29,6 +29,11 @@ const EditProduct = () => {
   const [previews, setPreviews] = useState<string[]>([]);
   const { singleProduct } = useSelector((state: any) => state.root.products);
   const GetAllCategory = useSelector((state: any) => state.root.categories);
+  const User = useSelector((state: any) => state.root.signIn);
+  const SocialUserToken = User?.socialLoginUserData?.token;
+  const UserToken = User?.loginData?.token;
+  const Token = SocialUserToken || UserToken;
+
   const productCategoryOptions = GetAllCategory.categories.map(
     (category: any) => ({
       value: category._id,
@@ -41,8 +46,8 @@ const EditProduct = () => {
   const { id }: any = useParams();
 
   useEffect(() => {
-    dispatch(getSingleProduct(id));
-    dispatch(GetAllCategories());
+    dispatch(getSingleProduct({ id, token: Token }));
+    dispatch(GetAllCategories({ token: Token }));
   }, [dispatch, id]);
 
   useEffect(() => {

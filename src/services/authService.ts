@@ -94,30 +94,37 @@ export const ResetPasswordHandler = createAsyncThunk(
 export const fetchUsers = createAsyncThunk(
   "users/fetchUsers",
   async (
-    { page, searchQuery }: { page: number; searchQuery: string },
+    {
+      page,
+      searchQuery,
+      token,
+    }: { page: number; searchQuery: string; token: string },
+
     { rejectWithValue }
   ) => {
     try {
       const response = await AxiosDefaultSetting({
         method: "GET",
-        url: `/users/getall?page=${page}&search=${searchQuery}`, // Assuming you have an endpoint like /users
+        url: `/users/getall?page=${page}&search=${searchQuery}`,
+        token,
       });
       console.log(response, "response");
-      return response.data.data;
+      return response?.data?.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error?.response?.data?.message);
     }
   }
 );
 
 export const deleteUserHandler = createAsyncThunk(
   "auth/resetPassword",
-  async (id: string, { rejectWithValue }) => {
+  async ({ id, token }: { id: string; token: string }, { rejectWithValue }) => {
     try {
       const response = await AxiosDefaultSetting({
         method: "DELETE",
         url: `/users/deleteUser/${id}`,
         contentType: "application/json",
+        token,
       });
       return toast.success(response?.data?.message);
     } catch (error: any) {

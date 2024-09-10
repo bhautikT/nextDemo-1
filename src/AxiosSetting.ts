@@ -1,72 +1,66 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { isEmpty, isString } from "lodash";
-// import toast from "react-hot-toast";
+import { signOut } from "next-auth/react";
 
 const AxiosDefaultSetting = async ({
-  method,
+  method = "GET",
   data,
   url,
   contentType,
-  customHeaders, // New parameter for additional headers
-  responseType, // Important for binary data
+  customHeaders = {},
+  responseType = "json",
+  token, // Token parameter
 }: {
   method?: string;
   data?: any;
   url?: string;
   contentType?: string;
-  customHeaders?: Record<string, string>; // Additional headers
+  customHeaders?: Record<string, string>;
   responseType?: any;
+  token?: string; // Optional token parameter
 }): Promise<any> => {
   const AxiosDefault = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API,
     timeout: 10000,
     headers: {
-      "Content-Type": isEmpty(contentType) ? "application/json" : contentType,
+      "Content-Type": contentType || "application/json",
       Accept: "application/json",
-      ...customHeaders, // Merge custom headers
+      ...customHeaders,
     },
-    responseType: responseType || "json", // Set responseType to 'json' by default, but can be overridden
+    responseType,
   });
 
   AxiosDefault.interceptors.request.use(
-    async (config) => {
-      try {
-        const userData: any = localStorage.getItem("token");
-        if (isString(userData) && !isEmpty(userData)) {
-          config.headers["Authorization"] = `Bearer ${userData}`;
+    (config) => {
+      if (token) {
+        config.headers["Authorization"] = `Bearer ${token}`;
+      } else {
+        const storedToken = localStorage.getItem("token");
+        if (storedToken) {
+          config.headers["Authorization"] = `Bearer ${storedToken}`;
         }
-      } catch (error) {
-        console.log("Axios default error", error);
       }
       return config;
     },
-    (error) => {
-      return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
   );
 
   AxiosDefault.interceptors.response.use(
-    (response) => {
-      return response;
-    },
-    async (error) => {
-      if (error?.response && error?.response?.status === 401) {
-        try {
-          // toast.error(error?.response?.message)
-          localStorage.removeItem("token");
-          localStorage.clear();
-          //window.location.href = `${routes.signIn}?logout=true`;
-        } catch (e) {
-          return Promise.reject(e);
-        }
+    (response) => response,
+    (error) => {
+      if (error?.response?.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userSession");
+        localStorage.clear();
+
+        signOut({ callbackUrl: "/auth/loginPage" });
+
+        window.location.href = "/auth/loginPage";
       }
       return Promise.reject(error);
     }
   );
 
-  AxiosDefault.defaults.method = method;
-
-  return await AxiosDefault({
+  return AxiosDefault({
     method,
     data,
     url,

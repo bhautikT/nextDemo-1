@@ -19,13 +19,17 @@ interface CategoryFormValues {
 
 const EditCategory = () => {
   const { singleCategory } = useSelector((state: any) => state.root.categories);
+  const User = useSelector((state: any) => state.root.signIn);
+  const SocialUserToken = User?.socialLoginUserData?.token;
+  const UserToken = User?.loginData?.token;
+  const Token = SocialUserToken || UserToken;
 
   const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
   const { id }: any = useParams();
 
   useEffect(() => {
-    dispatch(getSingleCategory(id));
+    dispatch(getSingleCategory({ id, token: Token }));
   }, [dispatch, id]);
 
   useEffect(() => {

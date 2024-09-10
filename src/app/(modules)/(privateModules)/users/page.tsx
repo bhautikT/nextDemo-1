@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { FaTrash, FaEye } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 import defaultImage from "../../../../../public/assets/images.png";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/redux/store";
@@ -12,10 +12,14 @@ import Swal from "sweetalert2";
 
 const Users = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const debouncedSearchQuery = useDebounce(searchQuery, 500); // 500ms delay
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const { data: session } = useSession();
   const UserData = useSelector((state: any) => state.root.signIn.loginData);
-
+  const User = useSelector((state: any) => state.root.signIn);
+  const SocialUserToken = User?.socialLoginUserData?.token;
+  const UserToken = User?.loginData?.token;
+  const Token = SocialUserToken || UserToken;
+  console.log(Token, "UserToken");
   const dispatch: AppDispatch = useDispatch();
   const { users, totalPages, currentPage, loading, error } = useSelector(
     (state: any) => state.root.users
@@ -28,12 +32,18 @@ const Users = () => {
   }, [debouncedSearchQuery, dispatch, searchQuery]);
 
   useEffect(() => {
-    dispatch(
-      fetchUsers({ page: currentPage, searchQuery: debouncedSearchQuery })
-    );
-  }, [currentPage, debouncedSearchQuery, dispatch]);
+    if (Token) {
+      dispatch(
+        fetchUsers({
+          page: currentPage,
+          searchQuery: debouncedSearchQuery,
+          token: Token,
+        })
+      );
+    }
+  }, [currentPage, debouncedSearchQuery, dispatch, Token]);
 
-  const DeletePopUp = async (id: string) => {
+  const deletePopUp = async (id: string) => {
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -46,7 +56,12 @@ const Users = () => {
 
     if (result.isConfirmed) {
       try {
-        const deleteResult = await dispatch(deleteUserHandler(id));
+        const deleteResult = await dispatch(
+          deleteUserHandler({
+            id,
+            token: Token,
+          })
+        );
 
         if (deleteResult.meta.requestStatus === "fulfilled") {
           Swal.fire({
@@ -56,7 +71,13 @@ const Users = () => {
           });
 
           dispatch(setCurrentPage(1));
-          dispatch(fetchUsers({ page: 1, searchQuery: debouncedSearchQuery }));
+          dispatch(
+            fetchUsers({
+              page: 1,
+              searchQuery: debouncedSearchQuery,
+              token: Token,
+            })
+          );
         } else {
           Swal.fire({
             title: "Error!",
@@ -73,6 +94,8 @@ const Users = () => {
       }
     }
   };
+
+  console.log("users");
 
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow-lg mt-[14px]">
@@ -148,7 +171,7 @@ const Users = () => {
                   ) && (
                     <button
                       className="text-red-500 hover:text-red-700"
-                      onClick={() => DeletePopUp(user?._id)}
+                      onClick={() => deletePopUp(user?._id)}
                     >
                       <FaTrash size={20} />
                     </button>

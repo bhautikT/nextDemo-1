@@ -29,7 +29,7 @@ const withAuthPublic = (WrappedComponent: any) => {
     useEffect(() => {
       // Since verifyToken checks the window object, it's safe to call here; it won't run server-side.
       if (isAuthenticated) {
-        router.replace("/profile");
+        router.replace("/users");
       }
     }, [isAuthenticated, router]);
 

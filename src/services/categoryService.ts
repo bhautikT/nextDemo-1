@@ -10,11 +10,12 @@ interface EditCategoryPayload {
 // Thunk to fetch Category for Product
 export const GetAllCategories = createAsyncThunk(
   "product/getCategories",
-  async () => {
+  async ({ token }: { token: string }) => {
     try {
       const response = await AxiosDefaultSetting({
         method: "GET",
         url: `/category/getcategory`,
+        token,
       });
       console.log(response, "response");
       return response.data.data.categories;
@@ -26,13 +27,19 @@ export const GetAllCategories = createAsyncThunk(
 
 export const AddCategoryHandler = createAsyncThunk(
   "auth/addCategory",
-  async (formData: Object, { rejectWithValue }) => {
+  async (formData: Object, { rejectWithValue, getState }) => {
+    const state = getState() as any;
+    const User = state.root.signIn;
+    const SocialUserToken = User?.socialLoginUserData?.token;
+    const UserToken = User?.loginData?.token;
+    const token: string = SocialUserToken || UserToken;
     try {
       const response = await AxiosDefaultSetting({
         method: "POST",
         data: formData,
         url: "/category/addcategory",
         contentType: "application/json",
+        token,
       });
       return response.data;
     } catch (error: any) {
@@ -45,13 +52,18 @@ export const AddCategoryHandler = createAsyncThunk(
 export const fetchCategories = createAsyncThunk(
   "product/fetchCategories",
   async (
-    { page, searchQuery }: { page: number; searchQuery: string },
+    {
+      page,
+      searchQuery,
+      token,
+    }: { page: number; searchQuery: string; token: string },
     { rejectWithValue }
   ) => {
     try {
       const response = await AxiosDefaultSetting({
         method: "GET",
         url: `/category/getcategory?page=${page}&search=${searchQuery}`,
+        token,
       });
       console.log(response, "response");
       return response.data.data;
@@ -63,12 +75,13 @@ export const fetchCategories = createAsyncThunk(
 
 export const getSingleCategory = createAsyncThunk(
   "auth/getSingleCategory",
-  async (id: string) => {
+  async ({ id, token }: { id: string; token: string }) => {
     try {
       const response = await AxiosDefaultSetting({
         method: "GET",
         url: `/category/getcategory/${id}`,
         contentType: "application/json",
+        token,
       });
       console.log(response.data.data, "34");
       return response.data.data.category;
@@ -81,13 +94,20 @@ export const getSingleCategory = createAsyncThunk(
 
 export const EditCategoryHandler = createAsyncThunk(
   "auth/editCategory",
-  async (payload: EditCategoryPayload, { rejectWithValue }) => {
+  async (payload: EditCategoryPayload, { rejectWithValue, getState }) => {
+    const state = getState() as any;
+    const User = state.root.signIn;
+    const SocialUserToken = User?.socialLoginUserData?.token;
+    const UserToken = User?.loginData?.token;
+    const token: string = SocialUserToken || UserToken;
+
     try {
       const response = await AxiosDefaultSetting({
         method: "PATCH",
         data: payload.formData,
         url: `/category/updatecategory/${payload.id}`,
         contentType: "application/json",
+        token,
       });
       return toast.success(response?.data?.message);
     } catch (error: any) {
@@ -98,12 +118,13 @@ export const EditCategoryHandler = createAsyncThunk(
 
 export const deleteCategoryHandler = createAsyncThunk(
   "auth/deleteCategory",
-  async (id: string) => {
+  async ({ id, token }: { id: string; token: string }) => {
     try {
       const response = await AxiosDefaultSetting({
         method: "DELETE",
         url: `/category/deletecategory/${id}`,
         contentType: "application/json",
+        token,
       });
       return toast.success(response?.data?.message);
     } catch (error: any) {

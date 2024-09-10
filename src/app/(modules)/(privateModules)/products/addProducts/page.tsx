@@ -26,6 +26,11 @@ const AddProduct = () => {
   const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
   const GetAllCategory = useSelector((state: any) => state.root.categories);
+  const User = useSelector((state: any) => state.root.signIn);
+  const SocialUserToken = User?.socialLoginUserData?.token;
+  const UserToken = User?.loginData?.token;
+  const Token = SocialUserToken || UserToken;
+
   console.log(GetAllCategory, "GetAllCategory");
   const productCategoryOptions = GetAllCategory.categories.map(
     (category: any) => ({
@@ -46,7 +51,7 @@ const AddProduct = () => {
   };
 
   useEffect(() => {
-    dispatch(GetAllCategories());
+    dispatch(GetAllCategories({token :Token}));
   }, []);
 
   const onSubmit = async (

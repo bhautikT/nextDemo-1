@@ -40,8 +40,8 @@ const userSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.loading = false;
-        state.users = action.payload.users || [];
-        state.totalPages = action.payload.totalPages || 1;
+        state.users = action.payload?.users || [];
+        state.totalPages = action.payload?.totalPages || 1;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;

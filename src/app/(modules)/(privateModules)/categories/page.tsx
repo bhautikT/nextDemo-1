@@ -21,6 +21,11 @@ const Categories = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { singleCategory } = useSelector((state: any) => state.root.categories);
 
+  const User = useSelector((state: any) => state.root.signIn);
+  const SocialUserToken = User?.socialLoginUserData?.token;
+  const UserToken = User?.loginData?.token;
+  const Token = SocialUserToken || UserToken;
+
   console.log(singleCategory, "singleCategory");
 
   const dispatch: AppDispatch = useDispatch();
@@ -40,12 +45,18 @@ const Categories = () => {
   }, [debouncedSearchQuery, dispatch, searchQuery]);
 
   useEffect(() => {
-    dispatch(
-      fetchCategories({ page: currentPage, searchQuery: debouncedSearchQuery })
-    );
+    if (Token) {
+      dispatch(
+        fetchCategories({
+          page: currentPage,
+          searchQuery: debouncedSearchQuery,
+          token: Token,
+        })
+      );
+    }
   }, [currentPage, debouncedSearchQuery, dispatch]);
 
-  const DeletePopUp = async (id: string) => {
+  const deletePopUp = async (id: string) => {
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -58,7 +69,9 @@ const Categories = () => {
 
     if (result.isConfirmed) {
       try {
-        const deleteResult = await dispatch(deleteCategoryHandler(id));
+        const deleteResult = await dispatch(
+          deleteCategoryHandler({ id, token: Token })
+        );
 
         if (deleteResult.meta.requestStatus === "fulfilled") {
           Swal.fire({
@@ -69,7 +82,11 @@ const Categories = () => {
 
           dispatch(setCurrentPage(1));
           dispatch(
-            fetchCategories({ page: 1, searchQuery: debouncedSearchQuery })
+            fetchCategories({
+              page: 1,
+              searchQuery: debouncedSearchQuery,
+              token: Token,
+            })
           );
         } else {
           Swal.fire({
@@ -89,7 +106,7 @@ const Categories = () => {
   };
 
   const handleViewCategory = async (id: string) => {
-    await dispatch(getSingleCategory(id));
+    await dispatch(getSingleCategory({ id, token: Token }));
 
     setIsModalOpen(true);
   };
@@ -170,7 +187,7 @@ const Categories = () => {
 
                     <button
                       className="text-red-500 hover:text-red-700"
-                      onClick={() => DeletePopUp(category?._id)}
+                      onClick={() => deletePopUp(category?._id)}
                     >
                       <FaTrash size={20} />
                     </button>

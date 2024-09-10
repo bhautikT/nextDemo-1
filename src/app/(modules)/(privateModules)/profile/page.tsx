@@ -24,7 +24,6 @@ function User() {
       dispatch(resetProductData());
       dispatch(resetCategoryData());
       dispatch(logout());
-
       signOut({ callbackUrl: "/auth/loginPage" });
     } else {
       dispatch(logout());
@@ -41,7 +40,7 @@ function User() {
       <div className="w-32 h-32 mb-4 overflow-hidden rounded-full border-4 border-gray-200 bg-white shadow-md">
         <img
           src={
-            session && session.user?.image
+            session && (session.user?.image as string)
               ? (session.user?.image as string)
               : userimage?.src
           }

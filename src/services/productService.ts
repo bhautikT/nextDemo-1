@@ -11,13 +11,18 @@ interface EditProductPayload {
 export const fetchProducts = createAsyncThunk(
   "product/fetchProducts",
   async (
-    { page, searchQuery }: { page: number; searchQuery: string },
+    {
+      page,
+      searchQuery,
+      token,
+    }: { page: number; searchQuery: string; token: string },
     { rejectWithValue }
   ) => {
     try {
       const response = await AxiosDefaultSetting({
         method: "GET",
         url: `/product/products?page=${page}&search=${searchQuery}`,
+        token,
       });
       console.log(response, "response");
       return response.data.data;
@@ -29,13 +34,19 @@ export const fetchProducts = createAsyncThunk(
 
 export const addProducts = createAsyncThunk(
   "auth/addProduct",
-  async (formData: FormData, { rejectWithValue }) => {
+  async (formData: FormData, { rejectWithValue, getState }) => {
+    const state = getState() as any;
+    const User = state.root.signIn;
+    const SocialUserToken = User?.socialLoginUserData?.token;
+    const UserToken = User?.loginData?.token;
+    const token: string = SocialUserToken || UserToken;
     try {
       const response = await AxiosDefaultSetting({
         method: "POST",
         data: formData,
         url: "/product/products",
         contentType: "multipart/form-data", // Ensure content type is set for FormData
+        token,
       });
       return response.data;
     } catch (error: any) {
@@ -46,14 +57,19 @@ export const addProducts = createAsyncThunk(
 
 export const EditProducts = createAsyncThunk(
   "auth/editProduct", // Updated action type
-  async (payload: EditProductPayload, { rejectWithValue }) => {
+  async (payload: EditProductPayload, { rejectWithValue, getState }) => {
+    const state = getState() as any;
+    const User = state.root.signIn;
+    const SocialUserToken = User?.socialLoginUserData?.token;
+    const UserToken = User?.loginData?.token;
+    const token: string = SocialUserToken || UserToken;
     try {
       const response = await AxiosDefaultSetting({
         method: "PATCH",
         data: payload.formData,
         url: `/product/products/${payload.id}`,
-
         contentType: "multipart/form-data",
+        token,
       });
       return toast.success(response?.data?.message);
     } catch (error: any) {
@@ -64,12 +80,13 @@ export const EditProducts = createAsyncThunk(
 
 export const getSingleProduct = createAsyncThunk(
   "auth/getSingleProduct",
-  async (id: string) => {
+  async ({ id, token }: { id: string; token: string }) => {
     try {
       const response = await AxiosDefaultSetting({
         method: "GET",
         url: `/product/products/${id}`,
         contentType: "application/json",
+        token,
       });
       console.log(response.data.data, "34");
       return response.data.data;
@@ -82,12 +99,13 @@ export const getSingleProduct = createAsyncThunk(
 
 export const deleteProductHandler = createAsyncThunk(
   "auth/deleteProduct",
-  async (id: string) => {
+  async ({ id, token }: { id: string; token: string }) => {
     try {
       const response = await AxiosDefaultSetting({
         method: "DELETE",
         url: `/product/products/${id}`,
         contentType: "application/json",
+        token,
       });
       return toast.success(response?.data?.message);
     } catch (error: any) {
