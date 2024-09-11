@@ -98,14 +98,16 @@ export const fetchUsers = createAsyncThunk(
       page,
       searchQuery,
       token,
-    }: { page: number; searchQuery: string; token: string },
+      sortcoloum,
+      sortorder
+    }: { page: number; searchQuery: string; token: string;sortorder:string;sortcoloum:string },
 
     { rejectWithValue }
   ) => {
     try {
       const response = await AxiosDefaultSetting({
         method: "GET",
-        url: `/users/getall?page=${page}&search=${searchQuery}`,
+        url: `/users/getall?page=${page}&search=${searchQuery}&sortBy=${sortcoloum}&sortOrder=${sortorder}`,
         token,
       });
       console.log(response, "response");

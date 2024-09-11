@@ -1,4 +1,5 @@
 import React from "react";
+import { FaSortDown, FaSortUp, FaTrash } from "react-icons/fa";
 
 type TableColumn<T> = {
   header: string;
@@ -8,39 +9,62 @@ type TableColumn<T> = {
 };
 
 type TableProps<T> = {
-  columns: TableColumn<T>[];
-  data: T[];
+  columns: any;
+  tableData:any;
+  loading:any;
   onDelete?: (id: string) => void;
   currentPage?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
   pageClassNames?: string;
   actionButtons?: (row: T) => JSX.Element;
+  defaultImage:any
+  onSort:any
+  sortorder:any
+  sortcoloum:any
 };
+
 
 export const CommonTable = <T extends { id: string }>({
   columns,
-  data,
+  tableData,
+  loading,
   onDelete,
   currentPage = 1,
   totalPages = 1,
   onPageChange,
   pageClassNames = "",
   actionButtons,
-}: TableProps<T>) => {
+  defaultImage,
+  sortcoloum,
+  sortorder,
+  onSort}: TableProps<T>) => {
+  console.log(tableData,'data',columns)
+  const renderSortIcon = (columnKey: string) => {
+    if (sortcoloum === columnKey) {
+      return sortorder === "asc" ? (
+        <FaSortUp className="inline ml-2" />
+      ) : (
+        <FaSortDown className="inline ml-2" />
+      );
+    }
+    return null;
+  }
   return (
     <>
       <table className="min-w-full bg-white rounded-lg overflow-hidden shadow">
         <thead className="bg-gray-100">
           <tr>
-            {columns.map((column) => (
+            {columns.map((column:any) => (
               <th
-                key={column.header}
+                key={column.label}
+                onClick={() => onSort(column.key)} // Trigger sort on click
                 className={`py-4 px-6 text-left font-semibold text-gray-600 ${
                   column.className || ""
                 }`}
               >
-                {column.header}
+                {column.label}
+                {renderSortIcon(column.key)} 
               </th>
             ))}
             {onDelete && (
@@ -49,32 +73,36 @@ export const CommonTable = <T extends { id: string }>({
           </tr>
         </thead>
         <tbody>
-          {data.map((row) => (
-            <tr key={row.id} className="hover:bg-gray-50">
-              {columns.map((column) => (
-                <td
-                  key={column.header}
-                  className={`py-4 px-6 border-gray-200 text-gray-800 ${column.className || ""}`}
-                >
-                  {/* {column.render ? column.render(row[column.accessor], row) : row[column.accessor]} */}
-                </td>
-              ))}
-              {onDelete && (
-                <td className="py-4 px-6 border-gray-200 flex space-x-4">
-                  {actionButtons ? (
-                    actionButtons(row)
-                  ) : (
-                    <button
-                      className="text-red-500 hover:text-red-700"
-                      onClick={() => onDelete(row.id)}
-                    >
-                      Delete
-                    </button>
-                  )}
-                </td>
-              )}
-            </tr>
-          ))}
+        {tableData?.map((row: any, index: number) => (
+              <tr key={index} className="hover:bg-gray-50">
+                {columns.map((column:any) => (
+                  <td key={column.key} className="py-4 px-6 border-gray-200 text-gray-800">
+                    {column.type === "image" ? (
+                      <img
+                        src={
+                          row && row.provider
+                            ? row[column.key]
+                            : `${process.env.NEXT_PUBLIC_BASE_URL}${row[column.key]}` || defaultImage
+                              
+                        }
+                        alt={row?.name}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                    ) : (
+                      row[column.key]
+                    )}
+                  </td>
+                ))}
+                {onDelete && (
+                  <td className="py-4 px-6 border-gray-200 flex space-x-4"> <button
+                                    className="text-red-500 hover:text-red-700"
+                                    onClick={() => onDelete(row?._id)}
+                                  >
+                                    <FaTrash size={20} />
+                                  </button></td>
+                )}
+              </tr>
+            ))}
         </tbody>
       </table>
 
