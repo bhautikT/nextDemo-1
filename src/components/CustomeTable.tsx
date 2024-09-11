@@ -45,7 +45,7 @@ export const CommonTable = <T extends { id: string }>({
       return sortorder === "asc" ? (
         <FaSortUp className="inline ml-2" />
       ) : (
-        <FaSortDown className="inline ml-2" />
+        <FaSortDown className="inline ml-1" />
       );
     }
     return null;
